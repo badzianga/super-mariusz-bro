@@ -1,5 +1,5 @@
 # Super Mariusz Bro
-An attempt to reproduce Super Mario Bros in Python as my school project
+An attempt to reproduce Super Mario Bros in Python as my school project.
 
 
 # Used font
