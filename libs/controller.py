@@ -11,4 +11,4 @@ class Controller:
         self.player = Mariusz(self.screen, 32, 32)
 
     def run(self, dt: float) -> None:
-        self.player.draw()
+        self.player.update(dt)
