@@ -1,6 +1,6 @@
 # screen-related
-DISPLAY_SIZE = (256, 240)
-SCREEN_SIZE = (256, 240)
+DISPLAY_SIZE = (256, 224)
+SCREEN_SIZE = (1024, 896)
 FPS = 60
 
 # colors
