@@ -5,3 +5,4 @@ FPS = 60
 
 # colors
 BG_COLOR = (92, 148, 252)
+WHITE = (255, 255, 255)
