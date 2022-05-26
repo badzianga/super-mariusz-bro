@@ -1,6 +1,7 @@
 import pygame
 
 from .player import Mariusz
+from .constants import WHITE
 
 
 class Controller:
@@ -11,4 +12,6 @@ class Controller:
         self.player = Mariusz(self.screen, 32, 32)
 
     def run(self, dt: float) -> None:
+        surf = self.font.render("MARIUSZ", False, WHITE)
         self.player.update(dt)
+        self.screen.blit(surf, (32, 16))

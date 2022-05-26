@@ -24,17 +24,16 @@ class Mariusz(Sprite):
         keys = get_pressed()
 
         if keys[K_LEFT]:
-            self.speed.x = max(self.speed.x - 0.1, -2)
+            self.speed.x = max(self.speed.x - 0.1 * dt, -2)
         if keys[K_RIGHT]:
-            self.speed.x = min(self.speed.x + 0.1, 2)
+            self.speed.x = min(self.speed.x + 0.1 * dt, 2)
         if not keys[K_LEFT] and not keys[K_RIGHT]:
             if self.speed.x > 0.2:
-                self.speed.x -= 0.1
+                self.speed.x -= 0.1 * dt
             elif self.speed.x < -0.2:
-                self.speed.x += 0.1
+                self.speed.x += 0.1 * dt
             else:
                 self.speed.x = 0
-
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
