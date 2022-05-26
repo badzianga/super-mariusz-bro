@@ -18,6 +18,7 @@ class Controller:
         # player variables
         self.lifes = 3
         self.coins = 0
+        self.points = 0
 
         self.level = Level(screen)
         self.player = Mariusz(screen, 40, 184, self.add_coin, self.reset_coins)
@@ -31,6 +32,7 @@ class Controller:
 
     def add_coin(self) -> int:
         self.coins += 1
+        self.points += 200
         return self.coins
 
     def reset_coins(self) -> None:
@@ -42,7 +44,7 @@ class Controller:
         self.level.draw()
         self.player.update(dt, self.coins_group)
 
-        self.hud.update(self.coins)
+        self.hud.update(self.coins, self.points)
 
         self.coins_group.update(self.screen)
         self.debug.draw()

@@ -18,7 +18,6 @@ class Hud:
 
         self.components = {
             'MARIUSZ': (8, 0),
-            '000000': (8, 8),
             'WORLD': (128, 0),
             '1-1': (136 , 8),
             'TIME': (184, 0)
@@ -38,7 +37,7 @@ class Hud:
     def draw(self) -> None:
         self.screen.blit(self.surface, (16, 8))
 
-    def update(self, coins: int) -> None:
+    def update(self, coins: int, points: int) -> None:
         self.surface.fill(TRANSPARENT)
         for text, pos in self.components.items():
             surf = self.font.render(text, False, WHITE)
@@ -59,6 +58,12 @@ class Hud:
         else:
             surf = self.font.render(f'x{coins}', False, WHITE)
         self.surface.blit(surf, (80, 8))
+
+        # display points
+        zeros = 6-len(str(points))
+        surf = self.font.render(f'{"0" * zeros}{points}', False, WHITE)
+        self.surface.blit(surf, (8, 8))
+        
 
         # update timer
         if time() - self.last_time >= 0.4:
