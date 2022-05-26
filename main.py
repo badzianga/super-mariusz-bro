@@ -2,6 +2,7 @@ from sys import exit
 from time import time
 
 import pygame
+from pygame import mixer
 from pygame.constants import K_ESCAPE, KEYDOWN, QUIT
 
 from libs.constants import BG_COLOR, DISPLAY_SIZE, FPS, SCREEN_SIZE
@@ -10,6 +11,7 @@ from libs.controller import Controller
 
 def main() -> None:
     pygame.init()
+    mixer.pre_init()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     clock = pygame.time.Clock()
 
