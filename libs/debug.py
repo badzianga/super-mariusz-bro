@@ -1,8 +1,9 @@
+from pygame.font import Font
 from pygame.surface import Surface
 from pygame.time import Clock
-from pygame.font import Font
 
 from .constants import RED
+
 
 class Debug:
     def __init__(self, screen: Surface, clock: Clock) -> None:

@@ -15,7 +15,7 @@ class Controller:
 
         self.level = Level(screen)
         self.player = Mariusz(screen, 40, 184)
-        self.hud = Hud(screen)
+        self.hud = Hud(screen, "red")
 
         self.debug = Debug(screen, clock)
 
