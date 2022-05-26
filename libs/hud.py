@@ -3,6 +3,7 @@ from time import time
 from pygame.constants import SRCALPHA
 from pygame.font import Font
 from pygame.surface import Surface
+from pygame.image import load as load_image
 
 from .constants import WHITE, TRANSPARENT
 
@@ -22,6 +23,7 @@ class Hud:
             "1-1": (136 , 8),
             "TIME": (184, 0)
         }
+        self.coin_surface = load_image("img/mini_coin.png").convert_alpha()
         self.surface = Surface((224, 16), SRCALPHA)
 
     def draw(self) -> None:
@@ -33,9 +35,12 @@ class Hud:
             surf = self.font.render(text, False, WHITE)
             self.surface.blit(surf, pos)
 
+        # display coin
+        self.surface.blit(self.coin_surface, (72, 8))
+
         # update timer
         if time() - self.last_time > 0.4:
-            self.timer -= 1
+            self.timer = max(self.timer - 1, 0)
             self.last_time = time()
 
         # display time
