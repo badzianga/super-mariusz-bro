@@ -15,10 +15,12 @@ class Controller:
     def __init__(self, screen: Surface, clock: Clock) -> None:
         self.screen = screen
 
+        # player variables
+        self.lifes = 3
         self.coins = 0
 
         self.level = Level(screen)
-        self.player = Mariusz(screen, 40, 184, self.add_coin)
+        self.player = Mariusz(screen, 40, 184, self.add_coin, self.reset_coins)
         self.hud = Hud(screen, "red")
 
         self.coins_group = Group(Coin((84, 184), "red"), Coin((100, 184), "red"))
@@ -27,8 +29,13 @@ class Controller:
         music.load("music/smb_supermariobros.mp3")
         music.play(-1)
 
-    def add_coin(self):
+    def add_coin(self) -> int:
         self.coins += 1
+        return self.coins
+
+    def reset_coins(self) -> None:
+        self.coins -= 100
+        self.lifes += 1
 
     def run(self, dt: float) -> None:
         self.screen.fill(BG_COLOR)

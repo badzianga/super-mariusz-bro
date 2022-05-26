@@ -12,7 +12,7 @@ from pygame.transform import flip
 
 class Mariusz(Sprite):
     def __init__(self, screen: Surface, x: int, y: int,
-                 add_coin: FunctionType) -> None:
+                 add_coin: FunctionType, reset_coins: FunctionType) -> None:
         super().__init__()
 
         self.screen = screen
@@ -25,7 +25,9 @@ class Mariusz(Sprite):
         self.speed = Vector2(0, 0)
 
         self.add_coin = add_coin
+        self.reset_coins = reset_coins
         self.coin_sound = Sound('sfx/smb_coin.wav')
+        self.oneup_sound = Sound('sfx/smb_1-up.wav')
 
     def move_horizontally(self, dt: float) -> None:
         keys = get_pressed()
@@ -51,8 +53,11 @@ class Mariusz(Sprite):
         for coin in coins:
             if self.rect.colliderect(coin.rect):
                 coin.kill()
-                self.coin_sound.play()
-                self.add_coin()
+                if self.add_coin() >= 100:
+                    self.reset_coins()
+                    self.oneup_sound.play()
+                else:
+                    self.coin_sound.play()
 
     def draw(self) -> None:
         if self.flip:
