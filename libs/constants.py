@@ -6,4 +6,6 @@ FPS = 30
 
 # colors
 BG_COLOR = (92, 148, 252)
+RED = (255, 0, 0)
+TRANSPARENT = (0, 0, 0, 0)
 WHITE = (255, 255, 255)

@@ -5,7 +5,7 @@ import pygame
 from pygame import mixer
 from pygame.constants import K_ESCAPE, KEYDOWN, QUIT
 
-from libs.constants import BG_COLOR, DISPLAY_SIZE, FPS, SCREEN_SIZE
+from libs.constants import DISPLAY_SIZE, FPS, SCREEN_SIZE
 from libs.controller import Controller
 
 
@@ -19,12 +19,10 @@ def main() -> None:
     pygame.display.set_icon(pygame.image.load("img/icon.png").convert_alpha())
 
     display = pygame.Surface(DISPLAY_SIZE)
-    controller = Controller(display)
+    controller = Controller(display, clock)
     last_time = time()
 
     while True:
-        display.fill(BG_COLOR)
-
         dt = (time() - last_time) * FPS
         last_time = time()
 
