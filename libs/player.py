@@ -20,7 +20,7 @@ class Mariusz(Sprite):
         self.pos = Vector2(x, y)
         self.speed = Vector2(0, 0)
 
-    def move_horizontally(self, dt: float):
+    def move_horizontally(self, dt: float) -> None:
         keys = get_pressed()
 
         if keys[K_LEFT]:
@@ -40,13 +40,13 @@ class Mariusz(Sprite):
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
-    def draw(self):
+    def draw(self) -> None:
         if self.flip:
             self.screen.blit(flip(self.image, True, False), self.rect)
         else:
             self.screen.blit(self.image, self.rect)
 
-    def update(self, dt: float):
+    def update(self, dt: float) -> None:
         self.move_horizontally(dt)
 
         self.draw()

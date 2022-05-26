@@ -1,6 +1,7 @@
 # screen-related
+SCALE = 2
 DISPLAY_SIZE = (256, 224)
-SCREEN_SIZE = (1024, 896)
+SCREEN_SIZE = (DISPLAY_SIZE[0] * SCALE, DISPLAY_SIZE[1] * SCALE)
 FPS = 30
 
 # colors
