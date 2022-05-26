@@ -19,7 +19,6 @@ class Hud:
         self.components = {
             'MARIUSZ': (8, 0),
             '000000': (8, 8),
-            'x00': (80, 8),
             'WORLD': (128, 0),
             '1-1': (136 , 8),
             'TIME': (184, 0)
@@ -39,13 +38,13 @@ class Hud:
     def draw(self) -> None:
         self.screen.blit(self.surface, (16, 8))
 
-    def update(self) -> None:
+    def update(self, coins: int) -> None:
         self.surface.fill(TRANSPARENT)
         for text, pos in self.components.items():
             surf = self.font.render(text, False, WHITE)
             self.surface.blit(surf, pos)
 
-        # display coin
+        # display coin indicator
         if time() - self.coin_timer >= self.coin_animation[self.coin_frame][1]:
             self.coin_timer = time()
             self.coin_frame += 1
@@ -53,6 +52,13 @@ class Hud:
                 self.coin_frame = 0
         coin_surface = self.coin_surfs[self.coin_animation[self.coin_frame][0]]
         self.surface.blit(coin_surface, (72, 8))
+
+        # display coins amount
+        if coins < 10:
+            surf = self.font.render(f'x0{coins}', False, WHITE)
+        else:
+            surf = self.font.render(f'x{coins}', False, WHITE)
+        self.surface.blit(surf, (80, 8))
 
         # update timer
         if time() - self.last_time >= 0.4:
