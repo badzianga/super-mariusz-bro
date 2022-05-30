@@ -9,21 +9,27 @@ from .constants import TRANSPARENT, WHITE
 
 
 class Hud:
+    """
+    Class responsible for displaying points, coins, current world and time.
+    It doesn't have logic to kill Mariusz when time is up or add extra life
+    after collecting 100 coins. It only shows information.
+    """
     def __init__(self, screen: Surface, theme: str) -> None:
+        """Initialize HUD."""
         self.screen = screen
         self.last_time = time()
         self.font = Font('fonts/PressStart2P.ttf', 8)
 
         self.timer = 400
 
-        self.components = {
+        self.components = {  # labels and their positions
             'MARIUSZ': (8, 0),
             'WORLD': (128, 0),
             '1-1': (136 , 8),
             'TIME': (184, 0)
         }
 
-        self.coin_surfs = [
+        self.coin_surfs = [  # coin images used for animation
             load_image(f'img/{theme}/mini_coin_{i}.png').convert_alpha()
             for i in range(3)
         ]
@@ -32,13 +38,19 @@ class Hud:
         self.coin_frame = 0
         self.coin_timer = time()
 
+        # HUD surface for easier positioning
         self.surface = Surface((224, 16), SRCALPHA)
 
     def draw(self) -> None:
+        """"Draw HUD onto screen."""
         self.screen.blit(self.surface, (16, 8))
 
     def update(self, coins: int, points: int) -> None:
+        """Update HUD content - coin animation, coins, points and time."""
+        # clear hud
         self.surface.fill(TRANSPARENT)
+
+        # display labels
         for text, pos in self.components.items():
             surf = self.font.render(text, False, WHITE)
             self.surface.blit(surf, pos)
@@ -64,7 +76,6 @@ class Hud:
         surf = self.font.render(f'{"0" * zeros}{points}', False, WHITE)
         self.surface.blit(surf, (8, 8))
         
-
         # update timer
         if time() - self.last_time >= 0.4:
             self.timer = max(self.timer - 1, 0)
