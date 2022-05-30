@@ -21,7 +21,7 @@ class Controller:
         self.points = 0
 
         self.level = Level(screen)
-        self.player = Mariusz(screen, 40, 184, self.add_coin, self.reset_coins)
+        self.player = Mariusz(screen, 40, 40, self.add_coin, self.reset_coins)
         self.hud = Hud(screen, "red")
 
         self.coins_group = Group(Coin((84, 184), "red"), Coin((100, 184), "red"))

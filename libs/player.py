@@ -84,6 +84,12 @@ class Mariusz(Sprite):
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
+    def move_vertically(self, dt: float) -> None:
+        self.speed.y = 5
+
+        self.pos.y += self.speed.y * dt
+        self.rect.y = self.pos.y
+
     def check_horizontal_collisions(self, tiles: Group) -> None:
         for tile in tiles:
             if tile.rect.colliderect(self.rect):
@@ -99,6 +105,16 @@ class Mariusz(Sprite):
                     self.pos.x = self.rect.x
                     self.speed.x = 0
                     return  # finish looking for collisions
+
+    def check_vertical_collisions(self, tiles: Group) -> None:
+        for tile in tiles:
+            if tile.rect.colliderect(self.rect):
+                # touching floor
+                if self.speed.y > 0:
+                    self.rect.bottom = tile.rect.top
+                    self.pos.y = self.rect.y
+                    self.speed.y = 0
+                return  # finish looking for collisions
 
     def check_coin_collision(self, coins: Group) -> None:
         for coin in coins:
@@ -118,8 +134,10 @@ class Mariusz(Sprite):
 
     def update(self, dt: float, coins: Group, tiles: Group) -> None:
         self.move_horizontally(dt)
-
         self.check_horizontal_collisions(tiles)
+
+        self.move_vertically(dt)
+        self.check_vertical_collisions(tiles)
 
         self.check_coin_collision(coins)
 
