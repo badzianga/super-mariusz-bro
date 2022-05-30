@@ -3,7 +3,7 @@ from time import time
 
 import pygame
 from pygame import mixer
-from pygame.constants import K_ESCAPE, KEYDOWN, QUIT, K_F12
+from pygame.constants import K_ESCAPE, KEYDOWN, QUIT, K_F12, K_F11
 
 from libs.constants import DISPLAY_SIZE, FPS, SCREEN_SIZE
 from libs.controller import Controller
@@ -23,6 +23,7 @@ def main() -> None:
     last_time = time()
 
     lock_fps = False
+    smooth_graphics = False
 
     while True:
         dt = (time() - last_time) * FPS
@@ -40,8 +41,15 @@ def main() -> None:
                     exit()
                 elif event.key == K_F12:
                     lock_fps = not lock_fps
+                elif event.key == K_F11:
+                    smooth_graphics = not smooth_graphics
 
-        screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
+        if smooth_graphics:
+            surf = pygame.transform.scale2x(display)
+        else:
+            surf = display.copy()
+        
+        screen.blit(pygame.transform.scale(surf, SCREEN_SIZE), (0, 0))
         pygame.display.update()
         if lock_fps:
             clock.tick(FPS)
