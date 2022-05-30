@@ -46,5 +46,9 @@ class Controller:
 
         self.hud.update(self.coins, self.points)
 
+        if self.hud.timer == 100:
+            music.load("music/smb_supermariobroshurry.mp3")
+            music.play()
+
         self.coins_group.update(self.screen)
         self.debug.draw()
