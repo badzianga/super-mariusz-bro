@@ -27,6 +27,8 @@ class Controller:
         self.coins_group = Group(Coin((84, 184), "red"), Coin((100, 184), "red"))
         self.debug = Debug(screen, clock)
 
+        self.dont_change_music = False
+
         music.load("music/smb_supermariobros.mp3")
         music.play(-1)
 
@@ -42,13 +44,16 @@ class Controller:
     def run(self, dt: float) -> None:
         self.screen.fill(BG_COLOR)
         self.level.draw()
-        self.player.update(dt, self.coins_group)
+        self.player.update(dt, self.coins_group, self.level.tiles)
 
         self.hud.update(self.coins, self.points)
 
         if self.hud.timer == 100:
+            if self.dont_change_music:
+                return
             music.load("music/smb_supermariobroshurry.mp3")
             music.play()
+            self.dont_change_music = True
 
         self.coins_group.update(self.screen)
         self.debug.draw()

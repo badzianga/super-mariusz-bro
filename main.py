@@ -3,15 +3,15 @@ from time import time
 
 import pygame
 from pygame import mixer
-from pygame.constants import K_ESCAPE, KEYDOWN, QUIT
+from pygame.constants import K_ESCAPE, KEYDOWN, QUIT, K_F12
 
 from libs.constants import DISPLAY_SIZE, FPS, SCREEN_SIZE
 from libs.controller import Controller
 
 
 def main() -> None:
+    mixer.pre_init(44100, 16, 2, 4096)
     pygame.init()
-    mixer.pre_init()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     clock = pygame.time.Clock()
 
@@ -21,6 +21,8 @@ def main() -> None:
     display = pygame.Surface(DISPLAY_SIZE)
     controller = Controller(display, clock)
     last_time = time()
+
+    lock_fps = False
 
     while True:
         dt = (time() - last_time) * FPS
@@ -36,10 +38,15 @@ def main() -> None:
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     exit()
+                elif event.key == K_F12:
+                    lock_fps = not lock_fps
 
         screen.blit(pygame.transform.scale(display, SCREEN_SIZE), (0, 0))
         pygame.display.update()
-        clock.tick()
+        if lock_fps:
+            clock.tick(FPS)
+        else:
+            clock.tick()
 
 
 if __name__ == "__main__":
