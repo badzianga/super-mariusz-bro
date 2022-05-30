@@ -17,7 +17,17 @@ class Mariusz(Sprite):
 
         self.screen = screen
 
-        self.image = load_image("img/idle_0.png").convert_alpha()
+        self.state = 'idle'
+        self.frame_index = 0
+        self.states = {
+            'idle': load_image('img/idle_0.png').convert_alpha(),
+            'run': [load_image(f'img/run_{i}.png').convert_alpha()
+                    for i in range(3)],
+            'jump': load_image('img/jump_0.png').convert_alpha(),
+            'die': load_image('img/die_0.png').convert_alpha(),
+            'brake': load_image('img/brake_0.png').convert_alpha()
+        }
+        self.image = self.states['idle']
         self.flip = False
 
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -26,31 +36,55 @@ class Mariusz(Sprite):
 
         self.add_coin = add_coin
         self.reset_coins = reset_coins
+
         self.coin_sound = Sound('sfx/smb_coin.wav')
         self.oneup_sound = Sound('sfx/smb_1-up.wav')
+
+    def change_state(self, new_state: str) -> None:
+        if new_state != self.state:
+            self.state = new_state
+            self.frame_index = 0
+
+    def update_animation(self, dt: float) -> None:
+        if self.state == "run":
+            self.frame_index += 0.25 * abs(self.speed.x) * dt
+            if self.frame_index >= 3:
+                self.frame_index = 0
+            self.image = self.states[self.state][int(self.frame_index)]
+        else:
+            self.image = self.states[self.state]
 
     def move_horizontally(self, dt: float) -> None:
         keys = get_pressed()
 
         if keys[K_LEFT]:
+            if self.speed.x > 0:
+                self.change_state("brake")
+            else:
+                self.change_state("run")
             self.speed.x = max(self.speed.x - 0.2 * dt, -2)
             self.flip = True
         if keys[K_RIGHT]:
+            if self.speed.x < 0:
+                self.change_state("brake")
+            else:
+                self.change_state("run")
             self.speed.x = min(self.speed.x + 0.2 * dt, 2)
             self.flip = False
 
-        if not keys[K_LEFT] and not keys[K_RIGHT]:
+        if ((keys[K_LEFT] and keys[K_RIGHT]) or
+            (not keys[K_LEFT] and not keys[K_RIGHT])):
             if self.speed.x > 0.2:
-                self.speed.x -= 0.1 * dt
+                self.speed.x -= 0.075 * dt
             elif self.speed.x < -0.2:
-                self.speed.x += 0.1 * dt
+                self.speed.x += 0.075 * dt
             else:
                 self.speed.x = 0
+                self.change_state("idle")
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
-    def check_horizontal_collisions(self, tiles: Group):
-        print(self.speed.x)
+    def check_horizontal_collisions(self, tiles: Group) -> None:
         for tile in tiles:
             if tile.rect.colliderect(self.rect):
                 # touching right wall
@@ -84,7 +118,11 @@ class Mariusz(Sprite):
 
     def update(self, dt: float, coins: Group, tiles: Group) -> None:
         self.move_horizontally(dt)
+
         self.check_horizontal_collisions(tiles)
+
         self.check_coin_collision(coins)
+
+        self.update_animation(dt)
 
         self.draw()
