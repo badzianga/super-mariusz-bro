@@ -1,3 +1,4 @@
+from math import ceil
 from time import time
 
 from pygame.constants import SRCALPHA
@@ -14,7 +15,7 @@ class Hud:
     It doesn't have logic to kill Mariusz when time is up or add extra life
     after collecting 100 coins. It only shows information.
     """
-    def __init__(self, screen: Surface, theme: str) -> None:
+    def __init__(self, screen: Surface, world: int, theme: str) -> None:
         """Initialize HUD."""
         self.screen = screen
         self.last_time = time()
@@ -22,12 +23,11 @@ class Hud:
 
         self.timer = 400
 
-        self.components = {  # labels and their positions
-            'MARIUSZ': (8, 0),
-            'WORLD': (128, 0),
-            '1-1': (136 , 8),
-            'TIME': (184, 0)
-        }
+        self.labels = (  # labels and their positions
+            (self.font.render('MARIUSZ', False, WHITE), (8, 0)),
+            (self.font.render('WORLD', False, WHITE), (128, 0)),
+            (self.font.render('TIME', False, WHITE), (184, 0))
+        )
 
         self.coin_surfs = [  # coin images used for animation
             load_image(f'img/{theme}/mini_coin_{i}.png').convert_alpha()
@@ -38,6 +38,9 @@ class Hud:
         self.coin_frame = 0
         self.coin_timer = time()
 
+        self.world = None
+        self.update_world(world)
+
         # HUD surface for easier positioning
         self.surface = Surface((224, 16), SRCALPHA)
 
@@ -45,15 +48,21 @@ class Hud:
         """"Draw HUD onto screen."""
         self.screen.blit(self.surface, (16, 8))
 
+    def update_world(self, world: int):
+        self.world = self.font.render(
+            f'{ceil(world / 4)}-{min(world % 4, 1)}', False, WHITE
+        )
+
     def update(self, coins: int, points: int) -> None:
-        """Update HUD content - coin animation, coins, points and time."""
+        """
+        Update HUD content - world, coin animation, coins, points and time.
+        """
         # clear hud
         self.surface.fill(TRANSPARENT)
 
         # display labels
-        for text, pos in self.components.items():
-            surf = self.font.render(text, False, WHITE)
-            self.surface.blit(surf, pos)
+        for label, pos in self.labels:
+            self.surface.blit(label, pos)
 
         # display coin indicator
         if time() - self.coin_timer >= self.coin_animation[self.coin_frame][1]:
@@ -84,5 +93,8 @@ class Hud:
         # display time
         surf = self.font.render(str(self.timer), False, WHITE)
         self.surface.blit(surf, (192, 8))
+
+        # display world
+        self.surface.blit(self.world, (136 , 8))
 
         self.draw()

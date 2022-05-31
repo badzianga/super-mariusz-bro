@@ -19,10 +19,11 @@ class Controller:
         self.lifes = 3
         self.coins = 0
         self.points = 0
+        self.world = 1
 
         self.level = Level(screen)
         self.player = Mariusz(screen, 40, 64, self.add_coin, self.reset_coins)
-        self.hud = Hud(screen, "red")
+        self.hud = Hud(screen, self.world, "red")
 
         self.coins_group = Group(Coin((84, 184), "red"), Coin((100, 184), "red"))
         self.debug = Debug(screen, clock)

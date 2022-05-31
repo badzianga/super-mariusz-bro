@@ -126,7 +126,6 @@ class Mariusz(Sprite):
                     self.speed.y = 0
                     self.in_air = False
                 return  # finish looking for collisions
-        print(self.speed.y)
         if abs(self.speed.y) > 1.5:
             self.in_air = True
             self.change_state("jump")
