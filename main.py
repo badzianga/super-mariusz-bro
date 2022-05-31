@@ -3,7 +3,7 @@ from time import time
 
 import pygame
 from pygame import mixer
-from pygame.constants import K_ESCAPE, KEYDOWN, QUIT, K_F12, K_F11
+from pygame.constants import K_ESCAPE, K_F11, K_F12, K_RETURN, KEYDOWN, QUIT
 
 from libs.constants import DISPLAY_SIZE, FPS, SCREEN_SIZE
 from libs.controller import Controller
@@ -39,6 +39,8 @@ def main() -> None:
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     exit()
+                elif event.key == K_RETURN:
+                    controller.pause()
                 elif event.key == K_F12:
                     lock_fps = not lock_fps
                 elif event.key == K_F11:

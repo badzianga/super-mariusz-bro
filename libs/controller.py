@@ -1,14 +1,14 @@
 from pygame import Surface
-from pygame.mixer import music
+from pygame.mixer import Sound, music
+from pygame.sprite import Group
 from pygame.time import Clock
 
+from .coin import Coin
 from .constants import BG_COLOR
 from .debug import Debug
 from .hud import Hud
 from .level import Level
 from .player import Mariusz
-from .coin import Coin
-from pygame.sprite import Group
 
 
 class Controller:
@@ -29,9 +29,12 @@ class Controller:
         self.debug = Debug(screen, clock)
 
         self.dont_change_music = False
+        self.pausing = False
 
         music.load("music/smb_supermariobros.mp3")
         music.play(-1)
+
+        self.pause_sound = Sound('sfx/smb_pause.wav')
 
     def add_coin(self) -> int:
         self.coins += 1
@@ -42,7 +45,18 @@ class Controller:
         self.coins -= 100
         self.lifes += 1
 
+    def pause(self) -> None:
+        self.pausing = not self.pausing
+        self.pause_sound.play()
+        if music.get_busy():
+            music.pause()
+        else:
+            music.unpause()
+
     def run(self, dt: float) -> None:
+        if self.pausing:
+            return
+
         self.screen.fill(BG_COLOR)
         self.level.draw()
         self.player.update(dt, self.coins_group, self.level.tiles)
