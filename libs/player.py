@@ -48,6 +48,11 @@ class Mariusz(Sprite):
             self.state = new_state
             self.frame_index = 0
 
+    def run_from_jump(self) -> None:
+        if self.state == 'jump':
+            self.state = 'run'
+            self.frame_index = 0
+
     def update_animation(self, dt: float) -> None:
         if self.state == "run":
             self.frame_index += 0.25 * abs(self.speed.x) * dt
@@ -75,15 +80,18 @@ class Mariusz(Sprite):
             self.speed.x = min(self.speed.x + 0.2 * dt, 2)
             self.flip = False
 
-        if ((keys[K_LEFT] and keys[K_RIGHT]) or
-            (not keys[K_LEFT] and not keys[K_RIGHT])):
-            if self.speed.x > 0.2:
-                self.speed.x -= 0.075 * dt
-            elif self.speed.x < -0.2:
-                self.speed.x += 0.075 * dt
-            else:
-                self.speed.x = 0
-                self.change_state("idle")
+        if not self.in_air:
+            if ((keys[K_LEFT] and keys[K_RIGHT]) or
+                (not keys[K_LEFT] and not keys[K_RIGHT])):
+                if self.speed.x > 0.2:
+                    self.speed.x -= 0.075 * dt
+                    self.run_from_jump()
+                elif self.speed.x < -0.2:
+                    self.speed.x += 0.075 * dt
+                    self.run_from_jump()
+                else:
+                    self.speed.x = 0
+                    self.change_state("idle")
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
