@@ -39,6 +39,9 @@ class Mariusz(Sprite):
 
         self.coin_sound = Sound('sfx/smb_coin.wav')
         self.oneup_sound = Sound('sfx/smb_1-up.wav')
+        self.jump_sound = Sound('sfx/smb_jump-small.wav')
+
+        self.in_air = False
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -85,7 +88,14 @@ class Mariusz(Sprite):
         self.rect.x = self.pos.x
 
     def move_vertically(self, dt: float) -> None:
-        self.speed.y = 5
+        self.speed.y = min(self.speed.y + 1 * dt, 8)
+
+        if not self.in_air:
+            keys = get_pressed()
+            if keys[K_z]:  # jump
+                self.jump_sound.play()
+                self.speed.y = -8
+                self.in_air = True
 
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
@@ -114,7 +124,12 @@ class Mariusz(Sprite):
                     self.rect.bottom = tile.rect.top
                     self.pos.y = self.rect.y
                     self.speed.y = 0
+                    self.in_air = False
                 return  # finish looking for collisions
+        print(self.speed.y)
+        if abs(self.speed.y) > 1.5:
+            self.in_air = True
+            self.change_state("jump")
 
     def check_coin_collision(self, coins: Group) -> None:
         for coin in coins:

@@ -52,7 +52,7 @@ def main() -> None:
         screen.blit(pygame.transform.scale(surf, SCREEN_SIZE), (0, 0))
         pygame.display.update()
         if lock_fps:
-            clock.tick(FPS)
+            clock.tick(60)
         else:
             clock.tick()
 
