@@ -22,13 +22,11 @@ class Controller:
         self.points = 0
         self.world = 1
 
-        self.killed = False
-
         self.level = Level(screen)
         self.player = Mariusz(screen, 32, 64, self.add_coin, self.reset_coins)
         self.hud = Hud(screen, self.world, 'red')
 
-        self.goomba = Goomba(176, 144, 'red')
+        self.enemies = Group(Goomba(176, 144, 'red'))
 
         self.coins_group = Group(Coin((83, 184), 'red'), Coin((99, 184), 'red'))
         self.debug = Debug(screen, clock)
@@ -65,10 +63,10 @@ class Controller:
         self.screen.fill(BG_COLOR)
         self.level.draw()
 
-        if not self.killed:
-            self.goomba.update(dt, self.level.tiles)
+        if self.player.is_alive:
+            self.enemies.update(dt, self.level.tiles)
 
-            self.player.update(dt, self.coins_group, self.level.tiles)
+            self.player.update(dt, self.coins_group, self.level.tiles, self.enemies)
 
             self.hud.update(self.coins, self.points)
 
@@ -78,14 +76,11 @@ class Controller:
                     music.play()
                 self.dont_change_music = True
             elif self.hud.timer == 0:
-                self.killed = True
-                music.load('music/smb_mariodie.wav')
-                music.play()
                 self.player.kill()
         else:
             self.player.die_animation(dt)
 
-        self.goomba.draw(self.screen)
+        self.enemies.draw(self.screen)
         self.player.draw()
         self.hud.draw()
 

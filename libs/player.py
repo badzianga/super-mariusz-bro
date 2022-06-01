@@ -5,8 +5,8 @@ from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_x, K_z
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.math import Vector2
-from pygame.mixer import Sound
-from pygame.sprite import Group, Sprite
+from pygame.mixer import Sound, music
+from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
 
@@ -41,10 +41,12 @@ class Mariusz(Sprite):
         self.coin_sound = Sound('sfx/smb_coin.wav')
         self.oneup_sound = Sound('sfx/smb_1-up.wav')
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
+        self.stomp_sound = Sound('sfx/smb_stomp.wav')
 
         self.in_air = False
 
         self.die_timer = 0
+        self.is_alive = True
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -155,9 +157,30 @@ class Mariusz(Sprite):
         if time() - self.die_timer >= 0.4: 
             self.move_vertically(dt)
 
+    def check_enemy_collisions(self, enemies: Group) -> None:
+        enemy_collisions = spritecollide(self, enemies, False)
+
+        if enemy_collisions:
+            player_bottom = self.rect.bottom
+
+            for enemy in enemy_collisions:
+                enemy_center = enemy.rect.centery
+                enemy_top = enemy.rect.top
+                if enemy_top < player_bottom < enemy_center and self.speed.y >= 0:
+                    print('collided')
+                    self.stomp_sound.play()
+                    self.speed.y = -8
+                    enemy.kill()
+                else:
+                    print('mariusz should be dead here')
+                    self.kill()
+
     def kill(self) -> None:
+        music.load('music/smb_mariodie.wav')
+        music.play()
         self.change_state('die')
         self.image = self.states['die']
+        self.is_alive = False
         self.speed.x = 0
         self.speed.y = -10
         self.die_timer = time()
@@ -168,7 +191,7 @@ class Mariusz(Sprite):
         else:
             self.screen.blit(self.image, self.rect)
 
-    def update(self, dt: float, coins: Group, tiles: Group) -> None:
+    def update(self, dt: float, coins: Group, tiles: Group, enemies: Group) -> None:
         self.move_horizontally(dt)
         self.check_horizontal_collisions(tiles)
 
@@ -176,5 +199,7 @@ class Mariusz(Sprite):
         self.check_vertical_collisions(tiles)
 
         self.check_coin_collision(coins)
+
+        self.check_enemy_collisions(enemies)
 
         self.update_animation(dt)
