@@ -13,7 +13,7 @@ class Coin(Sprite):
             for i in range(3)
         ]
         self.frame = 0
-        self.animation = [(0, 0.45), (1, 0.15), (2, 0.15), (1, 0.15)]
+        self.animation = ((0, 0.45), (1, 0.15), (2, 0.15), (1, 0.15))
         self.last_time = time()
 
         self.image = self.images[0]

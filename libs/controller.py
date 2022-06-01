@@ -6,6 +6,7 @@ from pygame.time import Clock
 from .coin import Coin
 from .constants import BG_COLOR
 from .debug import Debug
+from .enemies import Goomba
 from .hud import Hud
 from .level import Level
 from .player import Mariusz
@@ -22,16 +23,18 @@ class Controller:
         self.world = 1
 
         self.level = Level(screen)
-        self.player = Mariusz(screen, 40, 64, self.add_coin, self.reset_coins)
-        self.hud = Hud(screen, self.world, "red")
+        self.player = Mariusz(screen, 32, 64, self.add_coin, self.reset_coins)
+        self.hud = Hud(screen, self.world, 'red')
 
-        self.coins_group = Group(Coin((84, 184), "red"), Coin((100, 184), "red"))
+        self.goomba = Goomba(176, 144, 'red')
+
+        self.coins_group = Group(Coin((83, 184), 'red'), Coin((99, 184), 'red'))
         self.debug = Debug(screen, clock)
 
         self.dont_change_music = False
         self.pausing = False
 
-        music.load("music/smb_supermariobros.mp3")
+        music.load('music/smb_supermariobros.mp3')
         music.play(-1)
 
         self.pause_sound = Sound('sfx/smb_pause.wav')
@@ -59,6 +62,9 @@ class Controller:
 
         self.screen.fill(BG_COLOR)
         self.level.draw()
+
+        self.goomba.update(self.screen, dt, self.level.tiles)
+
         self.player.update(dt, self.coins_group, self.level.tiles)
 
         self.hud.update(self.coins, self.points)
@@ -66,7 +72,7 @@ class Controller:
         if self.hud.timer == 100:
             if self.dont_change_music:
                 return
-            music.load("music/smb_supermariobroshurry.mp3")
+            music.load('music/smb_supermariobroshurry.mp3')
             music.play()
             self.dont_change_music = True
 
