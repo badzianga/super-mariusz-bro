@@ -10,6 +10,7 @@ from .enemies import Goomba
 from .hud import Hud
 from .level import Level
 from .player import Mariusz
+from .points import Points
 
 
 class Controller:
@@ -23,10 +24,13 @@ class Controller:
         self.world = 1
 
         self.level = Level(screen)
-        self.player = Mariusz(screen, 32, 64, self.add_coin, self.reset_coins)
+        self.player = Mariusz(screen, 32, 64, self.add_coin, self.reset_coins,
+                              self.add_points_from_enemy)
         self.hud = Hud(screen, self.world, 'red')
 
         self.enemies = Group(Goomba(176, 144, 'red'))
+
+        self.floating_points = Group()
 
         self.coins_group = Group(Coin((83, 184), 'red'), Coin((99, 184), 'red'))
         self.debug = Debug(screen, clock)
@@ -43,6 +47,10 @@ class Controller:
         self.coins += 1
         self.points += 200
         return self.coins
+
+    def add_points_from_enemy(self, amount: int) -> None:
+        self.points += amount
+        self.floating_points.add(Points(self.player.rect.topleft, amount))
 
     def reset_coins(self) -> None:
         self.coins -= 100
@@ -62,6 +70,7 @@ class Controller:
 
         self.screen.fill(BG_COLOR)
         self.level.draw()
+        self.floating_points.update(dt)
 
         if self.player.is_alive:
             self.enemies.update(dt, self.level.tiles)
@@ -81,6 +90,7 @@ class Controller:
             self.player.die_animation(dt)
 
         self.enemies.draw(self.screen)
+        self.floating_points.draw(self.screen)
         self.player.draw()
         self.hud.draw()
 
