@@ -1,3 +1,4 @@
+from time import time
 from types import FunctionType
 
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_x, K_z
@@ -43,6 +44,8 @@ class Mariusz(Sprite):
 
         self.in_air = False
 
+        self.die_timer = 0
+
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
             self.state = new_state
@@ -54,7 +57,7 @@ class Mariusz(Sprite):
             self.frame_index = 0
 
     def update_animation(self, dt: float) -> None:
-        if self.state == "run":
+        if self.state == 'run':
             self.frame_index += 0.25 * abs(self.speed.x) * dt
             if self.frame_index >= 3:
                 self.frame_index = 0
@@ -67,16 +70,16 @@ class Mariusz(Sprite):
 
         if keys[K_LEFT]:
             if self.speed.x > 0:
-                self.change_state("brake")
+                self.change_state('brake')
             else:
-                self.change_state("run")
+                self.change_state('run')
             self.speed.x = max(self.speed.x - 0.2 * dt, -2)
             self.flip = True
         if keys[K_RIGHT]:
             if self.speed.x < 0:
-                self.change_state("brake")
+                self.change_state('brake')
             else:
-                self.change_state("run")
+                self.change_state('run')
             self.speed.x = min(self.speed.x + 0.2 * dt, 2)
             self.flip = False
 
@@ -91,7 +94,7 @@ class Mariusz(Sprite):
                     self.run_from_jump()
                 else:
                     self.speed.x = 0
-                    self.change_state("idle")
+                    self.change_state('idle')
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
@@ -136,7 +139,7 @@ class Mariusz(Sprite):
                 return  # finish looking for collisions
         if abs(self.speed.y) > 1.5:
             self.in_air = True
-            self.change_state("jump")
+            self.change_state('jump')
 
     def check_coin_collision(self, coins: Group) -> None:
         for coin in coins:
@@ -147,6 +150,17 @@ class Mariusz(Sprite):
                     self.oneup_sound.play()
                 else:
                     self.coin_sound.play()
+
+    def die_animation(self, dt: float) -> None:
+        if time() - self.die_timer >= 0.4: 
+            self.move_vertically(dt)
+
+    def kill(self) -> None:
+        self.change_state('die')
+        self.image = self.states['die']
+        self.speed.x = 0
+        self.speed.y = -10
+        self.die_timer = time()
 
     def draw(self) -> None:
         if self.flip:
@@ -164,5 +178,3 @@ class Mariusz(Sprite):
         self.check_coin_collision(coins)
 
         self.update_animation(dt)
-
-        self.draw()

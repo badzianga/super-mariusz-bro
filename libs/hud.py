@@ -100,5 +100,3 @@ class Hud:
 
         # display world
         self.surface.blit(self.world, (136 , 8))
-
-        self.draw()

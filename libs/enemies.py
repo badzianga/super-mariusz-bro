@@ -66,7 +66,7 @@ class Goomba(Sprite):
                     self.speed.y = 0
                 return  # finish looking for collisions
 
-    def update(self, screen: Surface, dt: float, tiles: Group) -> None:
+    def update(self, dt: float, tiles: Group) -> None:
         if self.state == 'walk':
             if time() - self.last_time >= self.animation_speed:
                 self.last_time = time()
@@ -80,5 +80,3 @@ class Goomba(Sprite):
 
         self.move_vertically(dt)
         self.check_vertical_collisions(tiles)
-
-        self.draw(screen)
