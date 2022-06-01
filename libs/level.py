@@ -2,7 +2,7 @@ from pygame.image import load as load_image
 from pygame.sprite import Group
 from pygame.surface import Surface
 
-from .tile import Tile
+from .tiles import Tile
 
 level_0 = [  # temporary map - for testing only
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

@@ -49,8 +49,12 @@ class Hud:
         self.screen.blit(self.surface, (16, 8))
 
     def update_world(self, world: int):
+        if world % 4 == 0:
+            second_number = 4
+        else:
+            second_number = world % 4
         self.world = self.font.render(
-            f'{ceil(world / 4)}-{min(world % 4, 1)}', False, WHITE
+            f'{ceil(world / 4)}-{second_number}', False, WHITE
         )
 
     def update(self, coins: int, points: int) -> None:

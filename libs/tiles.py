@@ -8,4 +8,3 @@ class Tile(Sprite):
 
         self.image = image
         self.rect = self.image.get_rect(topleft=position)
-        
