@@ -1,3 +1,6 @@
+# TODO: enemy should collide with other enemies
+# TODO: Mario shouldn't die when jumping on two overlapping enemies
+
 from time import time
 
 from pygame.image import load as load_image
@@ -42,7 +45,7 @@ class Goomba(Sprite):
 
     def check_horizontal_collisions(self, tiles: Group) -> None:
         for tile in tiles:
-            if tile.rect.colliderect(self.rect):
+            if self.rect.colliderect(tile.rect):
                 # touching right wall
                 if self.speed.x < 0:
                     self.rect.left = tile.rect.right
@@ -58,7 +61,7 @@ class Goomba(Sprite):
 
     def check_vertical_collisions(self, tiles: Group) -> None:
         for tile in tiles:
-            if tile.rect.colliderect(self.rect):
+            if self.rect.colliderect(tile.rect):
                 # touching floor
                 if self.speed.y > 0:
                     self.rect.bottom = tile.rect.top

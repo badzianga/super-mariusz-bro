@@ -117,7 +117,7 @@ class Mariusz(Sprite):
 
     def check_horizontal_collisions(self, tiles: Group) -> None:
         for tile in tiles:
-            if tile.rect.colliderect(self.rect):
+            if self.rect.colliderect(tile.rect):
                 # touching right wall
                 if self.speed.x < 0:
                     self.rect.left = tile.rect.right
@@ -133,7 +133,7 @@ class Mariusz(Sprite):
 
     def check_vertical_collisions(self, tiles: Group) -> None:
         for tile in tiles:
-            if tile.rect.colliderect(self.rect):
+            if self.rect.colliderect(tile.rect):
                 # touching floor
                 if self.speed.y > 0:
                     self.rect.bottom = tile.rect.top
