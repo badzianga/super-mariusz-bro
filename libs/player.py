@@ -140,6 +140,11 @@ class Mariusz(Sprite):
                     self.pos.y = self.rect.y
                     self.speed.y = 0
                     self.in_air = False
+                elif self.speed.y < 0:
+                    self.rect.top = tile.rect.bottom
+                    self.pos.y = self.rect.y
+                    self.speed.y = 0
+                    tile.bump()
                 return  # finish looking for collisions
         if abs(self.speed.y) > 1.5:
             self.in_air = True
@@ -193,7 +198,8 @@ class Mariusz(Sprite):
         else:
             self.screen.blit(self.image, self.rect)
 
-    def update(self, dt: float, coins: Group, tiles: Group, enemies: Group) -> None:
+    def update(self, dt: float, coins: Group, tiles: Group,
+               enemies: Group) -> None:
         self.move_horizontally(dt)
         self.check_horizontal_collisions(tiles)
 

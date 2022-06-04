@@ -57,18 +57,11 @@ class Hud:
             f'{ceil(world / 4)}-{second_number}', False, WHITE
         )
 
-    def update(self, coins: int, points: int) -> None:
+    def update_coin_indicator(self) -> None:
         """
-        Update HUD content - world, coin animation, coins, points and time.
+        Update coin indicator animation - it's a standalone method because it
+        should also be updated after death
         """
-        # clear hud
-        self.surface.fill(TRANSPARENT)
-
-        # display labels
-        for label, pos in self.labels:
-            self.surface.blit(label, pos)
-
-        # display coin indicator
         if time() - self.coin_timer >= self.coin_animation[self.coin_frame][1]:
             self.coin_timer = time()
             self.coin_frame += 1
@@ -76,6 +69,18 @@ class Hud:
                 self.coin_frame = 0
         coin_surface = self.coin_surfs[self.coin_animation[self.coin_frame][0]]
         self.surface.blit(coin_surface, (72, 8))
+
+    def update(self, coins: int, points: int) -> None:
+        """
+        Update HUD content - world, coins, points and time. Coin indicator is
+        updated separately.
+        """
+        # clear hud
+        self.surface.fill(TRANSPARENT)
+
+        # display labels
+        for label, pos in self.labels:
+            self.surface.blit(label, pos)
 
         # display coins amount
         if coins < 10:

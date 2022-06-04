@@ -75,7 +75,8 @@ class Controller:
         if self.player.is_alive:
             self.enemies.update(dt, self.level.tiles)
 
-            self.player.update(dt, self.coins_group, self.level.tiles, self.enemies)
+            self.player.update(dt, self.coins_group, self.level.tiles,
+                               self.enemies)
 
             self.hud.update(self.coins, self.points)
 
@@ -89,10 +90,13 @@ class Controller:
         else:
             self.player.die_animation(dt)
 
+        self.hud.update_coin_indicator()
+
         self.enemies.draw(self.screen)
         self.floating_points.draw(self.screen)
         self.player.draw()
         self.hud.draw()
 
         self.coins_group.update(self.screen)
+        self.level.tiles.update()
         self.debug.draw()
