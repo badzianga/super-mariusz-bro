@@ -20,6 +20,38 @@ class Tile(Sprite):
         return
 
 
+class Brick(Sprite):
+    def __init__(self, image: Surface, position: tuple) -> None:
+        super().__init__()
+
+        self.image = image
+        self.rect = self.image.get_rect(topleft=position)
+
+        self.frame = 0
+        self.sound = Sound('sfx/smb_bump.wav')
+        self.bumped = False
+        self.last_time = time()
+
+    def update(self) -> None:
+        if self.bumped:
+            if time() - self.last_time >= 0.015:
+                if self.frame < 5:
+                    self.rect.y -= 1
+                elif self.frame < 10: 
+                    self.rect.y += 1
+                else:
+                    self.bumped = False
+                self.frame += 1
+                self.last_time = time()
+
+    def bump(self) -> None:
+        self.sound.play()
+        self.frame = 0
+        self.bumped = True
+        # just to make sure it gets updated immediately I'm subtracting 1
+        self.last_time = time() - 1
+
+
 class QuestionBlock(Sprite):
     def __init__(self, position: tuple, powerup: bool=False) -> None:
         super().__init__()
@@ -69,3 +101,5 @@ class QuestionBlock(Sprite):
         self.image = self.images[3]
         self.just_bumped = True
         self.frame = 0
+        # just to make sure it gets updated immediately I'm subtracting 1
+        self.last_time = time() - 1
