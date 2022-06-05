@@ -13,7 +13,7 @@ from pygame.transform import flip
 
 class Mariusz(Sprite):
     def __init__(self, screen: Surface, x: int, y: int, add_coin: FunctionType,
-                 add_points_from_enemy: FunctionType) -> None:
+                 add_points: FunctionType) -> None:
         super().__init__()
 
         self.screen = screen
@@ -36,7 +36,7 @@ class Mariusz(Sprite):
         self.speed = Vector2(0, 0)
 
         self.add_coin = add_coin
-        self.add_points_from_enemy = add_points_from_enemy
+        self.add_points = add_points
 
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
         self.stomp_sound = Sound('sfx/smb_stomp.wav')
@@ -168,7 +168,7 @@ class Mariusz(Sprite):
                 if enemy_top < player_bottom < enemy_center and self.speed.y >= 0:
                     self.stomp_sound.play()
                     self.speed.y = -6
-                    self.add_points_from_enemy(100)
+                    self.add_points(100)
                     # TODO: points multiplier from combo
                     enemy.kill()
                 else:

@@ -11,7 +11,7 @@ from .hud import Hud
 from .level import Level
 from .player import Mariusz
 from .points import Points
-
+from .powerups import Mushroom, OneUP, Star, FireFlower
 
 class Controller:
     def __init__(self, screen: Surface, clock: Clock) -> None:
@@ -24,8 +24,7 @@ class Controller:
         self.world = 1
 
         self.level = Level(screen)
-        self.player = Mariusz(screen, 32, 64, self.add_coin,
-                              self.add_points_from_enemy)
+        self.player = Mariusz(screen, 32, 64, self.add_coin, self.add_points)
         self.hud = Hud(screen, self.world, 'red')
 
         self.enemies = Group(Goomba(176, 144, 'red'))
@@ -54,7 +53,7 @@ class Controller:
             return
         self.coin_sound.play()
 
-    def add_points_from_enemy(self, amount: int) -> None:
+    def add_points(self, amount: int) -> None:
         self.points += amount
         self.floating_points.add(Points(self.player.rect.topleft, amount))
 
