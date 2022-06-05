@@ -83,15 +83,11 @@ class Hud:
             self.surface.blit(label, pos)
 
         # display coins amount
-        if coins < 10:
-            surf = self.font.render(f'x0{coins}', False, WHITE)
-        else:
-            surf = self.font.render(f'x{coins}', False, WHITE)
+        surf = self.font.render(f'x{str(coins).zfill(2)}', False, WHITE)
         self.surface.blit(surf, (80, 8))
 
         # display points
-        zeros = 6-len(str(points))
-        surf = self.font.render(f'{"0" * zeros}{points}', False, WHITE)
+        surf = self.font.render(str(points).zfill(6), False, WHITE)
         self.surface.blit(surf, (8, 8))
         
         # update timer
