@@ -12,8 +12,7 @@ from pygame.transform import flip
 
 
 class Mariusz(Sprite):
-    def __init__(self, screen: Surface, x: int, y: int,
-                 add_coin: FunctionType, reset_coins: FunctionType,
+    def __init__(self, screen: Surface, x: int, y: int, add_coin: FunctionType,
                  add_points_from_enemy: FunctionType) -> None:
         super().__init__()
 
@@ -37,11 +36,8 @@ class Mariusz(Sprite):
         self.speed = Vector2(0, 0)
 
         self.add_coin = add_coin
-        self.reset_coins = reset_coins
         self.add_points_from_enemy = add_points_from_enemy
 
-        self.coin_sound = Sound('sfx/smb_coin.wav')
-        self.oneup_sound = Sound('sfx/smb_1-up.wav')
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
         self.stomp_sound = Sound('sfx/smb_stomp.wav')
 
@@ -154,11 +150,7 @@ class Mariusz(Sprite):
         for coin in coins:
             if self.rect.colliderect(coin.rect):
                 coin.kill()
-                if self.add_coin() >= 100:
-                    self.reset_coins()
-                    self.oneup_sound.play()
-                else:
-                    self.coin_sound.play()
+                self.add_coin()
 
     def die_animation(self, dt: float) -> None:
         if time() - self.die_timer >= 0.4: 

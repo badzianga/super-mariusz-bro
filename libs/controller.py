@@ -24,7 +24,7 @@ class Controller:
         self.world = 1
 
         self.level = Level(screen)
-        self.player = Mariusz(screen, 32, 64, self.add_coin, self.reset_coins,
+        self.player = Mariusz(screen, 32, 64, self.add_coin,
                               self.add_points_from_enemy)
         self.hud = Hud(screen, self.world, 'red')
 
@@ -42,19 +42,25 @@ class Controller:
         music.play(-1)
 
         self.pause_sound = Sound('sfx/smb_pause.wav')
+        self.coin_sound = Sound('sfx/smb_coin.wav')
+        self.oneup_sound = Sound('sfx/smb_1-up.wav')
 
-    def add_coin(self) -> int:
+    def add_coin(self) -> None:
         self.coins += 1
         self.points += 200
-        return self.coins
+        if self.coins >= 100:
+            self.coins -= 100
+            self.add_life()
+            return
+        self.coin_sound.play()
 
     def add_points_from_enemy(self, amount: int) -> None:
         self.points += amount
         self.floating_points.add(Points(self.player.rect.topleft, amount))
 
-    def reset_coins(self) -> None:
-        self.coins -= 100
+    def add_life(self) -> None:
         self.lifes += 1
+        self.oneup_sound.play()
 
     def pause(self) -> None:
         self.pausing = not self.pausing
