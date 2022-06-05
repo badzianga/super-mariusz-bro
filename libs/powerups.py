@@ -1,15 +1,16 @@
 from pygame.sprite import Sprite, Group
 from pygame.math import Vector2
+from pygame.surface import Surface
 
 
 class Mushroom(Sprite):
-    def __init__(self, image, position) -> None:
+    def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__()
 
         self.image = image
         self.rect = self.image.get_rect(topleft=position)
         self.pos = Vector2(position)
-        self.speed = Vector2(1, 0)
+        self.speed = Vector2(1.5, 0)
 
     def move_horizontally(self, dt: float) -> None:
         self.pos.x += self.speed.x * dt
@@ -47,14 +48,21 @@ class Mushroom(Sprite):
                     self.speed.y = 0
                 return  # finish looking for collisions
 
+    def update(self, dt: float, tiles: Group) -> None:
+        self.move_horizontally(dt)
+        self.check_horizontal_collisions(tiles)
+
+        self.move_vertically(dt)
+        self.check_vertical_collisions(tiles)
+
 
 class OneUP(Mushroom):
-    def __init__(self, image, position) -> None:
+    def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__(image, position)
 
 
 class Star(Sprite):
-    def __init__(self, image, position) -> None:
+    def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__()
 
         self.image = image
@@ -62,7 +70,7 @@ class Star(Sprite):
 
 
 class FireFlower(Sprite):
-    def __init__(self, image, position) -> None:
+    def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__()
 
         self.image = image

@@ -40,11 +40,18 @@ class Mariusz(Sprite):
 
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
         self.stomp_sound = Sound('sfx/smb_stomp.wav')
+        self.powerup_sound = Sound('sfx/smb_powerup.wav')
 
         self.in_air = False
 
         self.die_timer = 0
         self.is_alive = True
+
+        self.size = 0
+        self.upgrade_timer = 0
+        self.upgrade_sequence = (1, 2, 1, 2, 1, 2, 3, 1, 2, 3)
+        self.upgrade_index = 0
+        self.is_upgrading = False
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -55,6 +62,12 @@ class Mariusz(Sprite):
         if self.state == 'jump':
             self.state = 'run'
             self.frame_index = 0
+
+    def upgrade(self) -> None:
+        self.powerup_sound.play()
+        if self.size != 2:
+            self.size += 1
+            self.is_upgrading = True
 
     def update_animation(self, dt: float) -> None:
         if self.state == 'run':
@@ -147,14 +160,11 @@ class Mariusz(Sprite):
             self.change_state('jump')
 
     def check_coin_collision(self, coins: Group) -> None:
-        for coin in coins:
-            if self.rect.colliderect(coin.rect):
-                coin.kill()
-                self.add_coin()
+        coin_collisions = spritecollide(self, coins, False)
 
-    def die_animation(self, dt: float) -> None:
-        if time() - self.die_timer >= 0.4: 
-            self.move_vertically(dt)
+        for coin in coin_collisions:
+            coin.kill()
+            self.add_coin()
 
     def check_enemy_collisions(self, enemies: Group) -> None:
         enemy_collisions = spritecollide(self, enemies, False)
@@ -174,6 +184,28 @@ class Mariusz(Sprite):
                 else:
                     self.kill()
 
+    def check_mushroom_collisions(self, mushrooms: Group) -> None:
+        mushroom_collisions = spritecollide(self, mushrooms, False)
+
+        if mushroom_collisions:
+            for mushroom in mushroom_collisions:
+                mushroom.kill()
+                self.upgrade()
+                self.add_points(1000)
+
+    def upgrade_animation(self) -> None:
+        if time() - self.upgrade_timer >= 0.1:
+            self.upgrade_timer = time()
+            self.upgrade_index += 1
+            if self.upgrade_index >= 10:
+                self.upgrade_index = 0
+                self.is_upgrading = False
+                return
+
+    def die_animation(self, dt: float) -> None:
+        if time() - self.die_timer >= 0.4: 
+            self.move_vertically(dt)
+
     def kill(self) -> None:
         music.load('music/smb_mariodie.wav')
         music.play()
@@ -191,7 +223,7 @@ class Mariusz(Sprite):
             self.screen.blit(self.image, self.rect)
 
     def update(self, dt: float, coins: Group, tiles: Group,
-               enemies: Group) -> None:
+               enemies: Group, mushrooms: Group) -> None:
         self.move_horizontally(dt)
         self.check_horizontal_collisions(tiles)
 
@@ -201,5 +233,7 @@ class Mariusz(Sprite):
         self.check_coin_collision(coins)
 
         self.check_enemy_collisions(enemies)
+
+        self.check_mushroom_collisions(mushrooms)
 
         self.update_animation(dt)

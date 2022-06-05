@@ -2,6 +2,7 @@ from pygame import Surface
 from pygame.mixer import Sound, music
 from pygame.sprite import Group
 from pygame.time import Clock
+from pygame.image import load as load_image
 
 from .coin import Coin
 from .constants import BG_COLOR
@@ -23,15 +24,20 @@ class Controller:
         self.points = 0
         self.world = 1
 
+        self.images = {
+            'mushroom': load_image('img/mushroom.png'),
+            '1up': load_image('img/1up_mushroom.png')
+        }
+
         self.level = Level(screen)
         self.player = Mariusz(screen, 32, 64, self.add_coin, self.add_points)
         self.hud = Hud(screen, self.world, 'red')
 
         self.enemies = Group(Goomba(176, 144, 'red'))
-
         self.floating_points = Group()
-
         self.coins_group = Group(Coin((83, 184), 'red'), Coin((99, 184), 'red'))
+        self.mushrooms = Group(Mushroom(self.images['mushroom'], (32, 184)))
+
         self.debug = Debug(screen, clock)
 
         self.dont_change_music = False
@@ -77,11 +83,12 @@ class Controller:
         self.level.draw()
         self.floating_points.update(dt)
 
-        if self.player.is_alive:
+        if self.player.is_alive and not self.player.is_upgrading:
+            self.mushrooms.update(dt, self.level.tiles)
             self.enemies.update(dt, self.level.tiles)
 
             self.player.update(dt, self.coins_group, self.level.tiles,
-                               self.enemies)
+                               self.enemies, self.mushrooms)
 
             self.hud.update(self.coins, self.points)
 
@@ -92,10 +99,14 @@ class Controller:
                 self.dont_change_music = True
             elif self.hud.timer == 0:
                 self.player.kill()
+        elif self.player.is_upgrading:
+            self.player.upgrade_animation()
         else:
             self.player.die_animation(dt)
 
         self.hud.update_coin_indicator()
+
+        self.mushrooms.draw(self.screen)
 
         self.enemies.draw(self.screen)
         self.floating_points.draw(self.screen)
