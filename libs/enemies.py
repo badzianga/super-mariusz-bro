@@ -5,7 +5,7 @@ from time import time
 
 from pygame.image import load as load_image
 from pygame.math import Vector2
-from pygame.sprite import Sprite, Group
+from pygame.sprite import Group, Sprite
 from pygame.surface import Surface
 
 
