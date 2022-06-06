@@ -5,7 +5,7 @@ import pygame
 from pygame import mixer
 from pygame.constants import K_ESCAPE, K_F11, K_F12, K_RETURN, KEYDOWN, QUIT
 
-from libs.constants import DISPLAY_SIZE, FPS, SCREEN_SIZE
+from libs.constants import DISPLAY_SIZE, PHYSICS_FPS, SCREEN_SIZE
 from libs.controller import Controller
 
 
@@ -26,7 +26,7 @@ def main() -> None:
     smooth_graphics = False
 
     while True:
-        dt = (time() - last_time) * FPS
+        dt = (time() - last_time) * PHYSICS_FPS
         last_time = time()
 
         controller.run(dt)
