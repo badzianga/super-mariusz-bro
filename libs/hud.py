@@ -30,6 +30,7 @@ class Hud:
             (self.font.render('TIME', False, WHITE), (184, 0))
         )
 
+        # coin indicator stuff
         self.coin_surfs = [  # coin images used for animation
             load_image(f'img/{theme}/mini_coin_{i}.png').convert_alpha()
             for i in range(3)
@@ -39,8 +40,8 @@ class Hud:
         self.coin_frame = 0
         self.coin_timer = time()
 
-        self.world = None
-        self.update_world(world)
+        self.world = None  # later it'll be a rendered Surface
+        self.update_world(world)  # create Surface with world number
 
         # HUD surface for easier positioning
         self.surface = Surface((224, 16), SRCALPHA)
@@ -49,11 +50,17 @@ class Hud:
         """"Draw HUD onto screen."""
         self.screen.blit(self.surface, (16, 8))
 
-    def update_world(self, world: int):
+    def update_world(self, world: int) -> None:
+        """
+        Update Surface with world and map number. This method should be called
+        during map changing."""
+        # calculate map number
         if world % 4 == 0:
             second_number = 4
         else:
             second_number = world % 4
+
+        # update Surface with world and map number
         self.world = self.font.render(
             f'{ceil(world / 4)}-{second_number}', False, WHITE
         )
