@@ -1,8 +1,8 @@
 from pygame import Surface
+from pygame.image import load as load_image
 from pygame.mixer import Sound, music
 from pygame.sprite import Group
 from pygame.time import Clock
-from pygame.image import load as load_image
 
 from .coin import Coin
 from .constants import BG_COLOR
@@ -12,10 +12,18 @@ from .hud import Hud
 from .level import Level
 from .player import Mariusz
 from .points import Points
-from .powerups import Mushroom, OneUP, Star, FireFlower
+from .powerups import Mushroom
+
 
 class Controller:
+    """
+    Object responsible for controlling (almost) whole game. It creates all
+    necessary objects (Player, Level, HUD, etc.) and updates them.
+    Pausing, adding points, coins and lifes - it's all here.
+    """
+
     def __init__(self, screen: Surface, clock: Clock) -> None:
+        "Initialize Controller - 'brain' of the game."
         self.screen = screen
 
         # player variables
@@ -24,51 +32,69 @@ class Controller:
         self.points = 0
         self.world = 1
 
+        # most of the images will be loaded here in the future
         self.images = {
             'mushroom': load_image('img/mushroom.png'),
             '1up': load_image('img/1up_mushroom.png')
         }
 
+        # the most important objects
         self.level = Level(screen)
         self.player = Mariusz(screen, 32, 64, self.add_coin, self.add_points)
         self.hud = Hud(screen, self.world, 'red')
 
+        # groups
         self.enemies = Group(Goomba(176, 144, 'red'))
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'), Coin((99, 184), 'red'))
         self.mushrooms = Group(Mushroom(self.images['mushroom'], (32, 184)))
 
-        self.debug = Debug(screen, clock)
-
-        self.dont_change_music = False
-        self.pausing = False
-
-        music.load('music/smb_supermariobros.mp3')
-        music.play(-1)
-
+        # sounds
         self.pause_sound = Sound('sfx/smb_pause.wav')
         self.coin_sound = Sound('sfx/smb_coin.wav')
         self.oneup_sound = Sound('sfx/smb_1-up.wav')
 
+        # debug object, used to display useful info during development
+        self.debug = Debug(screen, clock)
+
+        # when timer is 100, music is changed a few times whis is unwanted
+        # that's why this switch is needed
+        self.dont_change_music = False
+        # TODO: set dont_change_music to True somewhere
+
+        self.paused = False  # if game is paused
+
+        # temporary, I'm using it here only during development
+        music.load('music/smb_supermariobros.mp3')
+        music.play(-1)
+
     def add_coin(self) -> None:
+        """Add coin and handle all its' consequences."""
         self.coins += 1
         self.points += 200
         if self.coins >= 100:
             self.coins -= 100
             self.add_life()
-            return
+            return  # if life is added, coin sound shouldn't be played
         self.coin_sound.play()
 
     def add_points(self, amount: int) -> None:
+        """
+        Add points and create floating points sprite.
+        This method should be called after killing enemies and collecting
+        power-ups.
+        """
         self.points += amount
         self.floating_points.add(Points(self.player.rect.topleft, amount))
 
     def add_life(self) -> None:
+        """Add life and play 1UP sound."""
         self.lifes += 1
         self.oneup_sound.play()
 
     def pause(self) -> None:
-        self.pausing = not self.pausing
+        """Pause game and music. Also play pausing sound."""
+        self.paused = not self.paused
         self.pause_sound.play()
         if music.get_busy():
             music.pause()
@@ -76,43 +102,60 @@ class Controller:
             music.unpause()
 
     def run(self, dt: float) -> None:
-        if self.pausing:
+        """Run game - update and draw all Controller's objects and groups."""
+        if self.paused:  # don't update game if paused
             return
 
-        self.screen.fill(BG_COLOR)
-        self.level.draw()
-        self.floating_points.update(dt)
+        self.screen.fill(BG_COLOR)  # clear whole screen Surface
+        self.level.draw()  # draw all tiles
+        
+        self.floating_points.update(dt)  # update and draw floating points
 
+        # this section is skipped when player is dead or took power-up
         if self.player.is_alive and not self.player.is_upgrading:
+            # change mushrooms' positions
             self.mushrooms.update(dt, self.level.tiles)
+
+            # update enemies' positions
             self.enemies.update(dt, self.level.tiles)
 
+            # update player position and collisions
             self.player.update(dt, self.coins_group, self.level.tiles,
                                self.enemies, self.mushrooms)
 
+            # update HUD content - points, coins and time
             self.hud.update(self.coins, self.points)
 
+            # play hurry music
             if self.hud.timer == 100:
                 if not self.dont_change_music:
                     music.load('music/smb_supermariobroshurry.mp3')
                     music.play()
                 self.dont_change_music = True
+
+            # kill player when time expires
             elif self.hud.timer == 0:
                 self.player.kill()
+
+        # update upgrade animation - when player took power-up 
         elif self.player.is_upgrading:
             self.player.upgrade_animation()
+        # update die animation when player is dead
         else:
             self.player.die_animation(dt)
 
+        # update coin indicator animation
+        # it's independent because it should be updated e.g. after death
         self.hud.update_coin_indicator()
 
-        self.mushrooms.draw(self.screen)
-
+        # draw objects onto screen Surface
         self.enemies.draw(self.screen)
         self.floating_points.draw(self.screen)
         self.player.draw()
         self.hud.draw()
-
         self.coins_group.update(self.screen)
+        self.mushrooms.draw(self.screen)
         self.level.tiles.update()
+
+        # temporary, I'm using it only during development
         self.debug.draw()
