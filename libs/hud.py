@@ -15,6 +15,7 @@ class Hud:
     It doesn't have logic to kill Mariusz when time is up or add extra life
     after collecting 100 coins. It only shows information.
     """
+
     def __init__(self, screen: Surface, world: int, theme: str) -> None:
         """Initialize HUD."""
         self.screen = screen

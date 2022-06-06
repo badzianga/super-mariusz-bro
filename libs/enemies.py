@@ -10,9 +10,15 @@ from pygame.surface import Surface
 
 
 class Goomba(Sprite):
+    """First and most basic enemy. It can walk and collide with map."""
+
     def __init__(self, x: int, y: int, theme: str) -> None:
+        """Initialize enemy - Goomba."""
         super().__init__()
 
+        self.is_alive = True  # used in updating and player's collision check
+
+        # animations and visual stuff
         self.frame = 0
         self.images = {
             'walk': [
@@ -21,50 +27,52 @@ class Goomba(Sprite):
             ],
             'die': load_image(f'img/{theme}/goomba_die_0.png').convert_alpha()
         }
-        self.is_alive = True
-
         self.animation_speed = 0.3
         self.last_time = time()
         self.image = self.images['walk'][0]
 
+        # positioning and movement stuff
         self.rect = self.image.get_rect(topleft=(x, y))
         self.pos = Vector2(x, y)
         self.speed = Vector2(1, 0)
 
     def draw(self, screen: Surface) -> None:
+        """Draw enemy onto screen."""
         screen.blit(self.image, self.rect)
 
     def move_horizontally(self, dt: float) -> None:
+        "Change horizontal position of the enemy."
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
     def move_vertically(self, dt: float) -> None:
+        "Apply gravity and change vertical position of the enemy."
         self.speed.y = min(self.speed.y + 1 * dt, 8)
 
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
 
     def check_horizontal_collisions(self, tiles: Group) -> None:
+        """Check horizontal collisions with map tiles and adjust position."""
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
-                # touching right wall
-                if self.speed.x < 0:
+                if self.speed.x < 0:  # touching right wall
                     self.rect.left = tile.rect.right
                     self.pos.x = self.rect.x
                     self.speed.x *= -1
                     return  # finish looking for collisions
-                # touching left wall
-                elif self.speed.x > 0:
+
+                elif self.speed.x > 0:  # touching left wall
                     self.rect.right = tile.rect.left
                     self.pos.x = self.rect.x
                     self.speed.x *= -1
                     return  # finish looking for collisions
 
     def check_vertical_collisions(self, tiles: Group) -> None:
+        """Check vertical collisions with map tiles and adjust position."""
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
-                # touching floor
-                if self.speed.y > 0:
+                if self.speed.y > 0:  # touching floor
                     # TODO: kill enemy if tile.bumped
                     self.rect.bottom = tile.rect.top
                     self.pos.y = self.rect.y
@@ -72,13 +80,15 @@ class Goomba(Sprite):
                 return  # finish looking for collisions
 
     def death_state(self) -> None:
-        self.frame = 0
+        """Change alive state of the enemy to false and make it squished."""
+        # self.frame = 0  # isn't really necessary
         self.last_time = time()
         self.image = self.images['die']
         self.is_alive = False
 
     def update(self, dt: float, tiles: Group) -> None:
-        if self.is_alive:
+        """Update enemy image, and position, disappear it after squished."""
+        if self.is_alive:  # alive state - update walking image
             if time() - self.last_time >= self.animation_speed:
                 self.last_time = time()
                 self.frame += 1
@@ -90,8 +100,10 @@ class Goomba(Sprite):
                 self.kill()
             return
 
+        # change horizontal position
         self.move_horizontally(dt)
         self.check_horizontal_collisions(tiles)
 
+        # change vertical position
         self.move_vertically(dt)
         self.check_vertical_collisions(tiles)
