@@ -1,4 +1,6 @@
-# TODO: Add coins to level and remove them from the controller
+# TODO: add coins to level and remove them from the controller
+# TODO: load map data from files
+# TODO: match-case instead of if statements
 
 from pygame.image import load as load_image
 from pygame.sprite import Group
@@ -25,16 +27,21 @@ level_0 = [  # temporary map - for testing only
 
 
 class Level:
+    """Object with map data that contains all tiles."""
+
     def __init__(self, screen: Surface) -> None:
+        self.screen = screen
+
         self.tiles = Group()
+
+        # temporary, these will be in Controller in the future
         self.tile_img = load_image('img/rock_0.png').convert()
         self.brick_img = load_image('img/brick_0.png').convert()
-
-        self.screen = screen
 
         self.load_level()
 
     def load_level(self) -> None:
+        """Load tiles and add them to the tiles group."""
         for y, row in enumerate(level_0):
             for x, cell in enumerate(row):
                 if cell == 0:
@@ -47,4 +54,5 @@ class Level:
                     self.tiles.add(Brick(self.brick_img, (x * 16, y * 16 + 8)))
 
     def draw(self) -> None:
+        """Draw all tiles onto screen."""
         self.tiles.draw(self.screen)
