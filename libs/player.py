@@ -173,6 +173,9 @@ class Mariusz(Sprite):
             player_bottom = self.rect.bottom
 
             for enemy in enemy_collisions:
+                if not enemy.is_alive:
+                    continue
+
                 enemy_center = enemy.rect.centery
                 enemy_top = enemy.rect.top
                 if enemy_top < player_bottom < enemy_center and self.speed.y >= 0:
@@ -180,7 +183,7 @@ class Mariusz(Sprite):
                     self.speed.y = -6
                     self.add_points(100)
                     # TODO: points multiplier from combo
-                    enemy.kill()
+                    enemy.death_state()
                 else:
                     self.kill()
 
