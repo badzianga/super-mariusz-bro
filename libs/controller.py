@@ -4,7 +4,7 @@ from pygame.mixer import Sound, music
 from pygame.sprite import Group
 from pygame.time import Clock
 
-from .coin import Coin
+from .coin import Coin, SpinningCoin
 from .constants import BG_COLOR
 from .debug import Debug
 from .enemies import Goomba
@@ -40,6 +40,7 @@ class Controller:
 
         # the most important objects
         self.level = Level(screen)
+        self.level.load_level(self.create_spinning_coin, self.add_coin)
         self.player = Mariusz(screen, 32, 64, self.add_coin, self.add_points)
         self.hud = Hud(screen, self.world, 'red')
 
@@ -85,12 +86,23 @@ class Controller:
         power-ups.
         """
         self.points += amount
-        self.floating_points.add(Points(self.player.rect.topleft, amount))
+        pos = list(self.player.rect.topleft)
+        pos[0] -= 8
+        self.create_floating_points(pos, amount)
+
+    def create_floating_points(self, position: tuple, amount: int) -> None:
+        """Create floating points sprite and add it to the group."""
+        self.floating_points.add(Points(position, amount))
 
     def add_life(self) -> None:
         """Add life and play 1UP sound."""
         self.lifes += 1
         self.oneup_sound.play()
+
+    def create_spinning_coin(self, position: tuple) -> None:
+        self.floating_points.add(
+            SpinningCoin(position, self.create_floating_points)
+        )
 
     def pause(self) -> None:
         """Pause game and music. Also play pausing sound."""
@@ -113,13 +125,9 @@ class Controller:
 
         # this section is skipped when player is dead or took power-up
         if self.player.is_alive and not self.player.is_upgrading:
-            # change mushrooms' positions
+            # update positions
             self.mushrooms.update(dt, self.level.tiles)
-
-            # update enemies' positions
             self.enemies.update(dt, self.level.tiles)
-
-            # update player position and collisions
             self.player.update(dt, self.coins_group, self.level.tiles,
                                self.enemies, self.mushrooms)
 

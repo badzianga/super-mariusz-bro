@@ -1,9 +1,10 @@
 from time import time
+from types import FunctionType
 
 from pygame.image import load as load_image
+from pygame.mixer import Sound
 from pygame.sprite import Sprite
 from pygame.surface import Surface
-from pygame.mixer import Sound
 
 
 class Tile(Sprite):
@@ -20,12 +21,9 @@ class Tile(Sprite):
         return
 
 
-class Brick(Sprite):
+class Brick(Tile):
     def __init__(self, image: Surface, position: tuple) -> None:
-        super().__init__()
-
-        self.image = image
-        self.rect = self.image.get_rect(topleft=position)
+        super().__init__(image, position)
 
         self.frame = 0
         self.sound = Sound('sfx/smb_bump.wav')
@@ -53,7 +51,8 @@ class Brick(Sprite):
 
 
 class QuestionBlock(Sprite):
-    def __init__(self, position: tuple, powerup: bool=False) -> None:
+    def __init__(self, position: tuple, create_spinning_coin: FunctionType,
+                 add_coin: FunctionType, powerup: bool=False) -> None:
         super().__init__()
 
         self.images = [
@@ -70,12 +69,25 @@ class QuestionBlock(Sprite):
 
         self.sound = Sound('sfx/smb_bump.wav')
         self.bumped = False
+        self.powerup = powerup
         self.just_bumped = False
+        self.created_coin = False
+
+        self.create_spinning_coin = create_spinning_coin
+        self.add_coin = add_coin
+
+        # coin sound
+        self.coin_sound = Sound('sfx/smb_coin.wav')
 
     def update(self) -> None:
         if self.bumped:
             return
         if self.just_bumped:
+            if not self.created_coin:
+                self.create_spinning_coin((self.rect.x + 4, self.rect.y - 16))
+                self.add_coin()
+                self.created_coin = True
+                self.coin_sound.play()
             if time() - self.last_time >= 0.015:
                 if self.frame < 5:
                     self.rect.y -= 1
@@ -92,9 +104,6 @@ class QuestionBlock(Sprite):
             if self.frame >= 4:
                 self.frame = 0
             self.image = self.images[self.animation[self.frame][0]]
-
-    def draw(self, screen: Surface) -> None:
-        screen.blit(self.image, self.rect)
 
     def bump(self) -> None:
         self.sound.play()

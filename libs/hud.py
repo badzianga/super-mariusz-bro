@@ -1,3 +1,5 @@
+# TODO: time position when <100 and then <10
+
 from math import ceil
 from time import time
 

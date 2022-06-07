@@ -2,6 +2,7 @@
 # TODO: load map data from files
 # TODO: match-case instead of if statements
 
+from types import FunctionType
 from pygame.image import load as load_image
 from pygame.sprite import Group
 from pygame.surface import Surface
@@ -38,9 +39,8 @@ class Level:
         self.tile_img = load_image('img/rock_0.png').convert()
         self.brick_img = load_image('img/brick_0.png').convert()
 
-        self.load_level()
-
-    def load_level(self) -> None:
+    def load_level(self, create_spinning_coin: FunctionType,
+                   add_coin: FunctionType) -> None:
         """Load tiles and add them to the tiles group."""
         for y, row in enumerate(level_0):
             for x, cell in enumerate(row):
@@ -49,7 +49,8 @@ class Level:
                 elif cell == 1:
                     self.tiles.add(Tile(self.tile_img, (x * 16, y * 16 + 8)))
                 elif cell == 2:
-                    self.tiles.add(QuestionBlock((x * 16, y * 16 + 8)))
+                    self.tiles.add(QuestionBlock((x * 16, y * 16 + 8),
+                                                 create_spinning_coin, add_coin))
                 elif cell == 3:
                     self.tiles.add(Brick(self.brick_img, (x * 16, y * 16 + 8)))
 
