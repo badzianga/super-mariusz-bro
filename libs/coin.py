@@ -80,7 +80,6 @@ class SpinningCoin(Sprite):
         if time() - self.total_time >= 0.5:
             self.create_floating_points((self.rect.x - 8, self.rect.y), 200)
             self.kill()
-            # TODO: spawn points Surface
         elif time() - self.last_time >= 0.05:
             self.last_time = time()
             self.frame += 1

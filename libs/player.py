@@ -1,3 +1,6 @@
+# TODO: problem with animation when walking into walls
+# TODO: running animation when jumping (extremum) 
+
 from time import time
 from types import FunctionType
 
@@ -71,6 +74,7 @@ class Mariusz(Sprite):
 
     def update_animation(self, dt: float) -> None:
         if self.state == 'run':
+            print(self.frame_index)
             self.frame_index += 0.25 * abs(self.speed.x) * dt
             if self.frame_index >= 3:
                 self.frame_index = 0
