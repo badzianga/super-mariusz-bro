@@ -31,6 +31,7 @@ class Controller:
         self.coins = 0
         self.points = 0
         self.world = 1
+        self.size = 0  # 0 - small, 1 - large, 2 - fire
 
         # most of the images will be loaded here in the future
         self.images = {
@@ -41,13 +42,14 @@ class Controller:
         # the most important objects
         self.level = Level(screen)
         self.level.load_level(self.create_spinning_coin, self.add_coin)
-        self.player = Mariusz(screen, 32, 64, self.add_coin, self.add_points)
+        self.player = Mariusz(screen, (32, 64), self.size, self.add_coin,
+                              self.add_points)
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
         self.enemies = Group(Goomba(176, 144, 'red'))
         self.floating_points = Group()
-        self.coins_group = Group(Coin((83, 184), 'red'), Coin((99, 184), 'red'))
+        self.coins_group = Group(Coin((83, 184), 'red'))
         self.mushrooms = Group(Mushroom(self.images['mushroom'], (32, 184)))
 
         # sounds

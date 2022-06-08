@@ -1,10 +1,11 @@
 # TODO: problem with animation when walking into walls
-# TODO: running animation when jumping (extremum) 
+# TODO: running animation when jumping (extremum)
+# TODO: disable constantly jumping when holding jump key
 
 from time import time
 from types import FunctionType
 
-from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_x, K_z
+from pygame.constants import K_LEFT, K_RIGHT, K_z
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.math import Vector2
@@ -12,36 +13,52 @@ from pygame.mixer import Sound, music
 from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
+from pygame import draw
+
+from libs.constants import WHITE
 
 
 class Mariusz(Sprite):
-    def __init__(self, screen: Surface, x: int, y: int, add_coin: FunctionType,
-                 add_points: FunctionType) -> None:
+    def __init__(self, screen: Surface, position: tuple, size: int,
+                 add_coin: FunctionType, add_points: FunctionType) -> None:
         super().__init__()
 
         self.screen = screen
 
+        self.size = size
+
         self.state = 'idle'
         self.frame_index = 0
         self.states = {
-            'idle': load_image('img/idle_0.png').convert_alpha(),
-            'run': [load_image(f'img/run_{i}.png').convert_alpha()
-                    for i in range(3)],
-            'jump': load_image('img/jump_0.png').convert_alpha(),
-            'die': load_image('img/die_0.png').convert_alpha(),
-            'brake': load_image('img/brake_0.png').convert_alpha()
+            0: {
+                'idle': load_image('img/idle_0.png').convert_alpha(),
+                'run': [load_image(f'img/run_{i}.png').convert_alpha()
+                        for i in range(3)],
+                'jump': load_image('img/jump_0.png').convert_alpha(),
+                'die': load_image('img/die_0.png').convert_alpha(),
+                'brake': load_image('img/brake_0.png').convert_alpha()
+            },
+            1: {
+                'idle': load_image('img/large_idle_0.png').convert_alpha(),
+                'run': [load_image(f'img/large_run_{i}.png').convert_alpha()
+                        for i in range(3)],
+                'jump': load_image('img/large_jump_0.png').convert_alpha(),
+                'crouch': load_image('img/large_crouch_0.png').convert_alpha(),
+                'brake': load_image('img/large_brake_0.png').convert_alpha()
+            }
         }
-        self.image = self.states['idle']
+        self.image = self.states[self.size]['idle']
         self.flip = False
 
-        self.rect = self.image.get_rect(topleft=(x, y))
-        self.pos = Vector2(x, y)
+        self.rect = self.image.get_rect(topleft=position)
+        self.pos = Vector2(position)
         self.speed = Vector2(0, 0)
 
         self.add_coin = add_coin
         self.add_points = add_points
 
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
+        self.large_jump_sound = Sound('sfx/smb_jump-super.wav')
         self.stomp_sound = Sound('sfx/smb_stomp.wav')
         self.powerup_sound = Sound('sfx/smb_powerup.wav')
 
@@ -70,17 +87,21 @@ class Mariusz(Sprite):
         self.powerup_sound.play()
         if self.size != 2:
             self.size += 1
+            # TODO: don't change rect size when self.size from 1 to 2
+            self.rect.inflate_ip(0, 16)
+            self.rect.y -= 8
+            self.pos.y -= 8
+            
             self.is_upgrading = True
 
     def update_animation(self, dt: float) -> None:
         if self.state == 'run':
-            print(self.frame_index)
             self.frame_index += 0.25 * abs(self.speed.x) * dt
             if self.frame_index >= 3:
                 self.frame_index = 0
-            self.image = self.states[self.state][int(self.frame_index)]
+            self.image = self.states[self.size][self.state][int(self.frame_index)]
         else:
-            self.image = self.states[self.state]
+            self.image = self.states[self.size][self.state]
 
     def move_horizontally(self, dt: float) -> None:
         keys = get_pressed()
@@ -121,7 +142,10 @@ class Mariusz(Sprite):
         if not self.in_air:
             keys = get_pressed()
             if keys[K_z]:  # jump
-                self.jump_sound.play()
+                if self.size == 0:
+                    self.jump_sound.play()
+                else:
+                    self.large_jump_sound.play()
                 self.speed.y = -8
                 self.in_air = True
 
@@ -157,7 +181,11 @@ class Mariusz(Sprite):
                     self.rect.top = tile.rect.bottom
                     self.pos.y = self.rect.y
                     self.speed.y = 0
-                    tile.bump()
+                    # TODO: destroying tile wouldn't kill enemy
+                    if self.size == 0:
+                        tile.bump()
+                    else:
+                        tile.destroy()
                 return  # finish looking for collisions
         if abs(self.speed.y) > 1.5:
             self.in_air = True
@@ -217,7 +245,7 @@ class Mariusz(Sprite):
         music.load('music/smb_mariodie.wav')
         music.play()
         self.change_state('die')
-        self.image = self.states['die']
+        self.image = self.states[self.size]['die']
         self.is_alive = False
         self.speed.x = 0
         self.speed.y = -10
@@ -228,6 +256,7 @@ class Mariusz(Sprite):
             self.screen.blit(flip(self.image, True, False), self.rect)
         else:
             self.screen.blit(self.image, self.rect)
+        draw.rect(self.screen, WHITE, self.rect, 1)
 
     def update(self, dt: float, coins: Group, tiles: Group,
                enemies: Group, mushrooms: Group) -> None:

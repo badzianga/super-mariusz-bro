@@ -26,7 +26,8 @@ class Brick(Tile):
         super().__init__(image, position)
 
         self.frame = 0
-        self.sound = Sound('sfx/smb_bump.wav')
+        self.bump_sound = Sound('sfx/smb_bump.wav')
+        self.break_sound = Sound('sfx/smb_breakblock.wav')
         self.bumped = False
         self.last_time = time()
 
@@ -43,11 +44,17 @@ class Brick(Tile):
                 self.last_time = time()
 
     def bump(self) -> None:
-        self.sound.play()
+        if self.bumped:
+            return
+        self.bump_sound.play()
         self.frame = 0
         self.bumped = True
         # just to make sure it gets updated immediately I'm subtracting 1
         self.last_time = time() - 1
+
+    def destroy(self) -> None:
+        self.break_sound.play()
+        self.kill()
 
 
 class QuestionBlock(Sprite):
@@ -102,9 +109,15 @@ class QuestionBlock(Sprite):
             self.image = self.images[self.animation[self.frame][0]]
 
     def bump(self) -> None:
+        if self.just_bumped:
+            return
         self.sound.play()
         self.image = self.images[3]
         self.just_bumped = True
         self.frame = 0
         # just to make sure it gets updated immediately I'm subtracting 1
         self.last_time = time() - 1
+
+    def destroy(self) -> None:
+        # it can't be destroyed, but this function must exist
+        self.bump()
