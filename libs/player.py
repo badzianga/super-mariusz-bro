@@ -217,7 +217,14 @@ class Mariusz(Sprite):
                     # TODO: points multiplier from combo
                     enemy.death_state()
                 else:
-                    self.kill()
+                    if self.size == 0:
+                        self.kill()
+                    else:
+                        # TODO: shrinking animation and invincibility
+                        self.size = 0
+                        self.rect.inflate_ip(0, -16)
+                        self.rect.y += 8
+                        self.pos.y += 8
 
     def check_mushroom_collisions(self, mushrooms: Group) -> None:
         mushroom_collisions = spritecollide(self, mushrooms, False)
