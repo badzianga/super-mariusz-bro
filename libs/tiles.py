@@ -76,9 +76,6 @@ class QuestionBlock(Sprite):
         self.create_spinning_coin = create_spinning_coin
         self.add_coin = add_coin
 
-        # coin sound
-        self.coin_sound = Sound('sfx/smb_coin.wav')
-
     def update(self) -> None:
         if self.bumped:
             return
@@ -87,7 +84,6 @@ class QuestionBlock(Sprite):
                 self.create_spinning_coin((self.rect.x + 4, self.rect.y - 16))
                 self.add_coin()
                 self.created_coin = True
-                self.coin_sound.play()
             if time() - self.last_time >= 0.015:
                 if self.frame < 5:
                     self.rect.y -= 1
