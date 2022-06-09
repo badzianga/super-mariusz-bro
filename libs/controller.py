@@ -1,11 +1,13 @@
 from pygame import Surface
 from pygame.image import load as load_image
+from pygame.math import Vector2
 from pygame.mixer import Sound, music
 from pygame.sprite import Group
 from pygame.time import Clock
 
 from .coin import Coin, SpinningCoin
 from .constants import BG_COLOR
+from .debris import Debris
 from .debug import Debug
 from .enemies import Goomba
 from .hud import Hud
@@ -36,12 +38,14 @@ class Controller:
         # most of the images will be loaded here in the future
         self.images = {
             'mushroom': load_image('img/mushroom.png'),
-            '1up': load_image('img/1up_mushroom.png')
+            '1up': load_image('img/1up_mushroom.png'),
+            'debris': load_image('img/red/debris.png')
         }
 
         # the most important objects
         self.level = Level(screen)
-        self.level.load_level(self.create_spinning_coin, self.add_coin)
+        self.level.load_level(self.create_spinning_coin, self.add_coin,
+                              self.create_debris)
         self.player = Mariusz(screen, (32, 64), self.size, self.add_coin,
                               self.add_points)
         self.hud = Hud(screen, self.world, 'red')
@@ -102,8 +106,18 @@ class Controller:
         self.oneup_sound.play()
 
     def create_spinning_coin(self, position: tuple) -> None:
+        """Create spinning coin from question block."""
         self.floating_points.add(
             SpinningCoin(position, self.create_floating_points)
+        )
+
+    def create_debris(self, pos: tuple) -> None:
+        """Create brick fragments from destroying brick."""
+        self.floating_points.add(
+            Debris((pos[0] - 8, pos[1] - 8), self.images['debris'], Vector2(-1, -12), False),
+            Debris((pos[0] + 8, pos[1] - 8), self.images['debris'], Vector2(1, -12), True),
+            Debris((pos[0] - 8, pos[1] + 8), self.images['debris'], Vector2(-1, -10), False),
+            Debris((pos[0] + 8, pos[1] + 8), self.images['debris'], Vector2(1, -10), True)
         )
 
     def pause(self) -> None:
@@ -123,7 +137,7 @@ class Controller:
         self.screen.fill(BG_COLOR)  # clear whole screen Surface
         self.level.draw()  # draw all tiles
         
-        self.floating_points.update(dt)  # update and draw floating points
+        self.floating_points.update(dt)  # update floating points
 
         # this section is skipped when player is dead or took power-up
         if self.player.is_alive and not self.player.is_upgrading:

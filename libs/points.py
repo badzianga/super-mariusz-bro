@@ -32,10 +32,6 @@ class Points(Sprite):
         # timestamp with time when sprite appeared
         self.timer = time()
 
-    def draw(self, screen: Surface) -> None:
-        """Draw points sprite onto screen."""
-        screen.blit(self.image, self.rect)
-
     def update(self, dt: float) -> None:
         """Update points sprite position and kill it when time expires."""
         self.pos.y += -1 * dt

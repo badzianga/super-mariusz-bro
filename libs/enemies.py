@@ -36,10 +36,6 @@ class Goomba(Sprite):
         self.pos = Vector2(x, y)
         self.speed = Vector2(1, 0)
 
-    def draw(self, screen: Surface) -> None:
-        """Draw enemy onto screen."""
-        screen.blit(self.image, self.rect)
-
     def move_horizontally(self, dt: float) -> None:
         "Change horizontal position of the enemy."
         self.pos.x += self.speed.x * dt

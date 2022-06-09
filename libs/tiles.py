@@ -15,14 +15,18 @@ class Tile(Sprite):
         self.rect = self.image.get_rect(topleft=position)
 
     def update(self) -> None:
-        pass
+        return
 
     def bump(self) -> None:
         return
 
+    def destroy(self, create_debris: FunctionType) -> None:
+        return
+
 
 class Brick(Tile):
-    def __init__(self, image: Surface, position: tuple) -> None:
+    def __init__(self, image: Surface, position: tuple,
+                 create_debris: FunctionType) -> None:
         super().__init__(image, position)
 
         self.frame = 0
@@ -30,6 +34,8 @@ class Brick(Tile):
         self.break_sound = Sound('sfx/smb_breakblock.wav')
         self.bumped = False
         self.last_time = time()
+
+        self.create_debris = create_debris
 
     def update(self) -> None:
         if self.bumped:
@@ -54,6 +60,7 @@ class Brick(Tile):
 
     def destroy(self) -> None:
         self.break_sound.play()
+        self.create_debris(self.rect.center)
         self.kill()
 
 

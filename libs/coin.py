@@ -90,7 +90,3 @@ class SpinningCoin(Sprite):
         # update position
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
-
-    def draw(self, screen: Surface) -> None:
-        """Draw coin onto screen."""
-        screen.blit(self.image, self.rect)

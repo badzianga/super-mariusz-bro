@@ -40,7 +40,7 @@ class Level:
         self.brick_img = load_image('img/brick_0.png').convert()
 
     def load_level(self, create_spinning_coin: FunctionType,
-                   add_coin: FunctionType) -> None:
+                   add_coin: FunctionType, create_debris: FunctionType) -> None:
         """Load tiles and add them to the tiles group."""
         for y, row in enumerate(level_0):
             for x, cell in enumerate(row):
@@ -52,7 +52,8 @@ class Level:
                     self.tiles.add(QuestionBlock((x * 16, y * 16 + 8),
                                                  create_spinning_coin, add_coin))
                 elif cell == 3:
-                    self.tiles.add(Brick(self.brick_img, (x * 16, y * 16 + 8)))
+                    self.tiles.add(Brick(self.brick_img, (x * 16, y * 16 + 8),
+                                         create_debris))
 
     def draw(self) -> None:
         """Draw all tiles onto screen."""
