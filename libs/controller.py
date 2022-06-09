@@ -2,7 +2,7 @@ from pygame import Surface
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.mixer import Sound, music
-from pygame.sprite import Group
+from pygame.sprite import Group, Sprite
 from pygame.time import Clock
 
 from .coin import Coin, SpinningCoin
@@ -45,7 +45,7 @@ class Controller:
         # the most important objects
         self.level = Level(screen)
         self.level.load_level(self.create_spinning_coin, self.add_coin,
-                              self.create_debris)
+                              self.create_debris, self.add_powerup)
         self.player = Mariusz(screen, (32, 64), self.size, self.add_coin,
                               self.add_points)
         self.hud = Hud(screen, self.world, 'red')
@@ -54,7 +54,7 @@ class Controller:
         self.enemies = Group(Goomba(176, 144, 'red'))
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'))
-        self.mushrooms = Group(Mushroom(self.images['mushroom'], (32, 184)))
+        self.powerups = Group()
 
         # sounds
         self.pause_sound = Sound('sfx/smb_pause.wav')
@@ -73,7 +73,12 @@ class Controller:
 
         # temporary, I'm using it here only during development
         music.load('music/smb_supermariobros.mp3')
-        music.play(-1)
+        # music.play(-1)
+
+    def add_powerup(self, position: tuple) -> None:
+        """Generate proper power-up and add it to power-ups group."""
+        if self.size == 0:
+            self.powerups.add(Mushroom(self.images['mushroom'], position))
 
     def add_coin(self) -> None:
         """Add coin and handle all its' consequences."""
@@ -142,10 +147,10 @@ class Controller:
         # this section is skipped when player is dead or took power-up
         if self.player.is_alive and not self.player.is_upgrading:
             # update positions
-            self.mushrooms.update(dt, self.level.tiles)
+            self.powerups.update(dt, self.level.tiles)
             self.enemies.update(dt, self.level.tiles)
             self.player.update(dt, self.coins_group, self.level.tiles,
-                               self.enemies, self.mushrooms)
+                               self.enemies, self.powerups)
 
             # update HUD content - points, coins and time
             self.hud.update(self.coins, self.points)
@@ -178,7 +183,7 @@ class Controller:
         self.player.draw()
         self.hud.draw()
         self.coins_group.update(self.screen)
-        self.mushrooms.draw(self.screen)
+        self.powerups.draw(self.screen)
         self.level.tiles.update()
 
         # temporary, I'm using it only during development

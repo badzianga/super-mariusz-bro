@@ -18,8 +18,8 @@ level_0 = [  # temporary map - for testing only
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 3, 2, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -40,7 +40,8 @@ class Level:
         self.brick_img = load_image('img/brick_0.png').convert()
 
     def load_level(self, create_spinning_coin: FunctionType,
-                   add_coin: FunctionType, create_debris: FunctionType) -> None:
+                   add_coin: FunctionType, create_debris: FunctionType,
+                   add_powerup: FunctionType) -> None:
         """Load tiles and add them to the tiles group."""
         for y, row in enumerate(level_0):
             for x, cell in enumerate(row):
@@ -49,8 +50,10 @@ class Level:
                 elif cell == 1:
                     self.tiles.add(Tile(self.tile_img, (x * 16, y * 16 + 8)))
                 elif cell == 2:
-                    self.tiles.add(QuestionBlock((x * 16, y * 16 + 8),
-                                                 create_spinning_coin, add_coin))
+                    self.tiles.add(
+                        QuestionBlock((x * 16, y * 16 + 8), create_spinning_coin,
+                                      add_coin, add_powerup, True)
+                        )
                 elif cell == 3:
                     self.tiles.add(Brick(self.brick_img, (x * 16, y * 16 + 8),
                                          create_debris))

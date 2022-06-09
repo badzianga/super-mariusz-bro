@@ -66,7 +66,8 @@ class Brick(Tile):
 
 class QuestionBlock(Sprite):
     def __init__(self, position: tuple, create_spinning_coin: FunctionType,
-                 add_coin: FunctionType, powerup: bool=False) -> None:
+                 add_coin: FunctionType, add_powerup: FunctionType,
+                 powerup: bool=False) -> None:
         super().__init__()
 
         self.images = [
@@ -81,23 +82,32 @@ class QuestionBlock(Sprite):
         self.image = self.images[0]
         self.rect = self.image.get_rect(topleft=position)
 
-        self.sound = Sound('sfx/smb_bump.wav')
+        self.bump_sound = Sound('sfx/smb_bump.wav')
+        self.powerup_sound = Sound('sfx/smb_powerup_appears.wav')
+
         self.bumped = False
         self.powerup = powerup
         self.just_bumped = False
         self.created_coin = False
+        self.played_powerup_sound = False
 
         self.create_spinning_coin = create_spinning_coin
         self.add_coin = add_coin
+        self.add_powerup = add_powerup
 
     def update(self) -> None:
         if self.bumped:
             return
         if self.just_bumped:
-            if not self.created_coin:
-                self.create_spinning_coin((self.rect.x + 4, self.rect.y - 16))
-                self.add_coin()
-                self.created_coin = True
+            if self.powerup:
+                if not self.played_powerup_sound:
+                    self.powerup_sound.play()
+                    self.played_powerup_sound = True
+            else:
+                if not self.created_coin:
+                    self.create_spinning_coin((self.rect.x + 4, self.rect.y - 16))
+                    self.add_coin()
+                    self.created_coin = True
             if time() - self.last_time >= 0.015:
                 if self.frame < 5:
                     self.rect.y -= 1
@@ -105,6 +115,9 @@ class QuestionBlock(Sprite):
                     self.rect.y += 1
                 else:
                     self.bumped = True
+                    if self.powerup:
+                        # TODO: juhuuu
+                        self.add_powerup((self.rect.x, self.rect.y - 16))
                 self.frame += 1
                 self.last_time = time()
             
@@ -118,7 +131,7 @@ class QuestionBlock(Sprite):
     def bump(self) -> None:
         if self.just_bumped:
             return
-        self.sound.play()
+        self.bump_sound.play()
         self.image = self.images[3]
         self.just_bumped = True
         self.frame = 0
