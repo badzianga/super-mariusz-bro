@@ -5,7 +5,7 @@
 from time import time
 from types import FunctionType
 
-from pygame.constants import K_LEFT, K_RIGHT, K_z
+from pygame.constants import K_LEFT, K_RIGHT, K_a, K_z
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.math import Vector2
@@ -86,6 +86,7 @@ class Mariusz(Sprite):
     def upgrade(self) -> None:
         self.powerup_sound.play()
         if self.size != 2:
+            self.speed.y = 0  # TODO: it could be only temporary
             self.size += 1
             # TODO: don't change rect size when self.size from 1 to 2
             self.rect.inflate_ip(0, 16)
@@ -106,19 +107,28 @@ class Mariusz(Sprite):
     def move_horizontally(self, dt: float) -> None:
         keys = get_pressed()
 
+        if keys[K_a]:
+            max_speed = 4
+            brake_speed = 0.3
+        else:
+            max_speed = 2
+            brake_speed = 0.2
+
         if keys[K_LEFT]:
             if self.speed.x > 0:
                 self.change_state('brake')
+                self.speed.x = max(self.speed.x - brake_speed * dt, -max_speed)
             else:
                 self.change_state('run')
-            self.speed.x = max(self.speed.x - 0.2 * dt, -2)
+                self.speed.x = max(self.speed.x - 0.2 * dt, -max_speed)
             self.flip = True
         if keys[K_RIGHT]:
             if self.speed.x < 0:
                 self.change_state('brake')
+                self.speed.x = min(self.speed.x + brake_speed * dt, max_speed)
             else:
                 self.change_state('run')
-            self.speed.x = min(self.speed.x + 0.2 * dt, 2)
+                self.speed.x = min(self.speed.x + 0.2 * dt, max_speed)
             self.flip = False
 
         if not self.in_air:
