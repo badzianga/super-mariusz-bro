@@ -20,7 +20,7 @@ class Tile(Sprite):
     def bump(self) -> None:
         return
 
-    def destroy(self, create_debris: FunctionType) -> None:
+    def destroy(self) -> None:
         return
 
 
