@@ -5,7 +5,7 @@
 from time import time
 from types import FunctionType
 
-from pygame.constants import K_LEFT, K_RIGHT, K_a, K_z
+from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_a, K_z
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.math import Vector2
@@ -63,6 +63,7 @@ class Mariusz(Sprite):
         self.powerup_sound = Sound('sfx/smb_powerup.wav')
 
         self.in_air = False
+        self.crouching = False
 
         self.die_timer = 0
         self.is_alive = True
@@ -114,7 +115,14 @@ class Mariusz(Sprite):
             max_speed = 2
             brake_speed = 0.2
 
-        if keys[K_LEFT]:
+        if self.size > 0:
+            if keys[K_DOWN] and not self.in_air:
+                self.change_state('crouch')
+                self.crouching = True
+            else:
+                self.crouching = False
+
+        if keys[K_LEFT] and not self.crouching:
             if self.speed.x > 0:
                 self.change_state('brake')
                 self.speed.x = max(self.speed.x - brake_speed * dt, -max_speed)
@@ -122,7 +130,7 @@ class Mariusz(Sprite):
                 self.change_state('run')
                 self.speed.x = max(self.speed.x - 0.2 * dt, -max_speed)
             self.flip = True
-        if keys[K_RIGHT]:
+        if keys[K_RIGHT] and not self.crouching:
             if self.speed.x < 0:
                 self.change_state('brake')
                 self.speed.x = min(self.speed.x + brake_speed * dt, max_speed)
@@ -133,16 +141,25 @@ class Mariusz(Sprite):
 
         if not self.in_air:
             if ((keys[K_LEFT] and keys[K_RIGHT]) or
-                (not keys[K_LEFT] and not keys[K_RIGHT])):
+                (not keys[K_LEFT] and not keys[K_RIGHT]) or
+                self.crouching):
                 if self.speed.x > 0.2:
-                    self.speed.x -= 0.075 * dt
+                    if self.crouching:
+                        self.speed.x -= 0.15 * dt
+                    else:
+                        self.speed.x -= 0.075 * dt
                     self.run_from_jump()
                 elif self.speed.x < -0.2:
-                    self.speed.x += 0.075 * dt
+                    if self.crouching:
+                        self.speed.x += 0.15 * dt
+                    else:
+                        self.speed.x += 0.075 * dt
                     self.run_from_jump()
                 else:
                     self.speed.x = 0
-                    self.change_state('idle')
+                    if not self.crouching:
+                        self.change_state('idle')
+
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
 
