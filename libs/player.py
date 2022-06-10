@@ -115,12 +115,12 @@ class Mariusz(Sprite):
             max_speed = 2
             brake_speed = 0.2
 
-        if self.size > 0:
-            if keys[K_DOWN] and not self.in_air:
+        if keys[K_DOWN] and not self.in_air:
+            if self.size > 0:
                 self.change_state('crouch')
-                self.crouching = True
-            else:
-                self.crouching = False
+            self.crouching = True
+        else:
+            self.crouching = False
 
         if keys[K_LEFT] and not self.crouching:
             if self.speed.x > 0:
@@ -157,7 +157,7 @@ class Mariusz(Sprite):
                     self.run_from_jump()
                 else:
                     self.speed.x = 0
-                    if not self.crouching:
+                    if not self.crouching or (self.crouching and self.size == 0):
                         self.change_state('idle')
 
         self.pos.x += self.speed.x * dt
@@ -304,6 +304,9 @@ class Mariusz(Sprite):
 
         self.check_enemy_collisions(enemies)
 
+        # TODO: there is a bug when jumping immediately after upgrade sequence
+        # if it will be even after changes in jumping mechanics
+        # move this function before move_horizontally() 
         self.check_mushroom_collisions(mushrooms)
 
         self.update_animation(dt)
