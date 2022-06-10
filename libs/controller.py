@@ -90,16 +90,19 @@ class Controller:
             return  # if life is added, coin sound shouldn't be played
         self.coin_sound.play()
 
-    def add_points(self, amount: int) -> None:
+    def add_points(self, amount: int, create_sprite: bool=True) -> None:
         """
         Add points and create floating points sprite.
         This method should be called after killing enemies and collecting
         power-ups.
         """
+        # I'm also using this method from create_debris
+        # breaking bricks wouldn't create points sprite
         self.points += amount
-        pos = list(self.player.rect.topleft)
-        pos[0] -= 8
-        self.create_floating_points(pos, amount)
+        if create_sprite:
+            pos = list(self.player.rect.topleft)
+            pos[0] -= 8
+            self.create_floating_points(pos, amount)
 
     def create_floating_points(self, position: tuple, amount: int) -> None:
         """Create floating points sprite and add it to the group."""
@@ -124,6 +127,7 @@ class Controller:
             Debris((pos[0] - 8, pos[1] + 8), self.images['debris'], Vector2(-1, -10), False),
             Debris((pos[0] + 8, pos[1] + 8), self.images['debris'], Vector2(1, -10), True)
         )
+        self.add_points(50, False)
 
     def pause(self) -> None:
         """Pause game and music. Also play pausing sound."""
