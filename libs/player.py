@@ -2,6 +2,7 @@
 # TODO: running animation when jumping (extremum)
 # TODO: disable constantly jumping when holding jump key
 
+from math import sin
 from time import time
 from types import FunctionType
 
@@ -14,6 +15,7 @@ from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
 from pygame import draw
+from pygame.time import get_ticks
 
 from libs.constants import WHITE
 
@@ -61,6 +63,7 @@ class Mariusz(Sprite):
         self.large_jump_sound = Sound('sfx/smb_jump-super.wav')
         self.stomp_sound = Sound('sfx/smb_stomp.wav')
         self.powerup_sound = Sound('sfx/smb_powerup.wav')
+        self.pipe_sound = Sound('sfx/smb_pipe.wav')
 
         self.in_air = False
         self.crouching = False
@@ -73,6 +76,9 @@ class Mariusz(Sprite):
         self.upgrade_sequence = (1, 2, 1, 2, 1, 2, 3, 1, 2, 3)
         self.upgrade_index = 0
         self.is_upgrading = False
+
+        self.invincible = False
+        self.hit_time = 0
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -93,8 +99,34 @@ class Mariusz(Sprite):
             self.rect.inflate_ip(0, 16)
             self.rect.y -= 8
             self.pos.y -= 8
-            
+
             self.is_upgrading = True
+
+    def downgrade(self) -> None:
+        self.pipe_sound.play()
+        self.speed.y = 0  # TODO: it could be only temporary
+        self.size = 0
+        self.rect.inflate_ip(0, -16)
+        self.rect.y += 8
+        self.pos.y += 8
+
+        self.is_upgrading = True
+        self.invincible = True
+        self.hit_time = time()
+
+    def remove_invincibility(self) -> None:
+        if not self.invincible:
+            return
+
+        if time() - self.hit_time >= 4:
+            self.invincible = False
+
+            # set full visibility to all states
+            self.states[0]['idle'].set_alpha(255)
+            self.states[0]['jump'].set_alpha(255)
+            self.states[0]['brake'].set_alpha(255)
+            for image in self.states[0]['run']:
+                image.set_alpha(255)
 
     def update_animation(self, dt: float) -> None:
         if self.state == 'run':
@@ -226,6 +258,9 @@ class Mariusz(Sprite):
             self.add_coin()
 
     def check_enemy_collisions(self, enemies: Group) -> None:
+        if self.invincible:
+            return
+
         enemy_collisions = spritecollide(self, enemies, False)
 
         if enemy_collisions:
@@ -247,11 +282,7 @@ class Mariusz(Sprite):
                     if self.size == 0:
                         self.kill()
                     else:
-                        # TODO: shrinking animation and invincibility
-                        self.size = 0
-                        self.rect.inflate_ip(0, -16)
-                        self.rect.y += 8
-                        self.pos.y += 8
+                        self.downgrade()
 
     def check_mushroom_collisions(self, mushrooms: Group) -> None:
         mushroom_collisions = spritecollide(self, mushrooms, False)
@@ -269,7 +300,14 @@ class Mariusz(Sprite):
             if self.upgrade_index >= 10:
                 self.upgrade_index = 0
                 self.is_upgrading = False
-                return
+
+                # after animation set images to half-invisible
+                if self.invincible:
+                    self.states[0]['idle'].set_alpha(128)
+                    self.states[0]['jump'].set_alpha(128)
+                    self.states[0]['brake'].set_alpha(128)
+                    for image in self.states[0]['run']:
+                        image.set_alpha(128)
 
     def die_animation(self, dt: float) -> None:
         if time() - self.die_timer >= 0.4: 
@@ -294,6 +332,8 @@ class Mariusz(Sprite):
 
     def update(self, dt: float, coins: Group, tiles: Group,
                enemies: Group, mushrooms: Group) -> None:
+        self.remove_invincibility()
+
         self.move_horizontally(dt)
         self.check_horizontal_collisions(tiles)
 
