@@ -146,7 +146,8 @@ class Controller:
         self.screen.fill(BG_COLOR)  # clear whole screen Surface
         self.level.draw()  # draw all tiles
         
-        self.floating_points.update(dt)  # update floating points
+        # update floating points, spinning coins and debris
+        self.floating_points.update(dt)
 
         # this section is skipped when player is dead or took power-up
         if self.player.is_alive and not self.player.is_upgrading:

@@ -2,10 +2,10 @@
 # TODO: running animation when jumping (extremum)
 # TODO: disable constantly jumping when holding jump key
 
-from math import sin
 from time import time
 from types import FunctionType
 
+from pygame import draw
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_a, K_z
 from pygame.image import load as load_image
 from pygame.key import get_pressed
@@ -14,8 +14,6 @@ from pygame.mixer import Sound, music
 from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
-from pygame import draw
-from pygame.time import get_ticks
 
 from libs.constants import WHITE
 
@@ -38,7 +36,9 @@ class Mariusz(Sprite):
                         for i in range(3)],
                 'jump': load_image('img/jump_0.png').convert_alpha(),
                 'die': load_image('img/die_0.png').convert_alpha(),
-                'brake': load_image('img/brake_0.png').convert_alpha()
+                'brake': load_image('img/brake_0.png').convert_alpha(),
+                'upgrade': [load_image(f'img/upgrade_{i}.png').convert_alpha()
+                            for i in range(3)]
             },
             1: {
                 'idle': load_image('img/large_idle_0.png').convert_alpha(),
@@ -73,7 +73,7 @@ class Mariusz(Sprite):
 
         self.size = 0
         self.upgrade_timer = 0
-        self.upgrade_sequence = (1, 2, 1, 2, 1, 2, 3, 1, 2, 3)
+        self.upgrade_sequence = (0, 1, 0, 1, 0, 1, 2, 0, 1, 2)
         self.upgrade_index = 0
         self.is_upgrading = False
 
@@ -129,8 +129,15 @@ class Mariusz(Sprite):
                 image.set_alpha(255)
 
     def update_animation(self, dt: float) -> None:
+        # this one is checked ONLY ONCE just after upgrade() or downgrade()
+        # TODO: this might be somewhere else, kinda bad it's checked every frame
+        if self.is_upgrading:
+            self.image = self.states[0]['idle']
+            return
+        
         if self.state == 'run':
             self.frame_index += 0.25 * abs(self.speed.x) * dt
+            # TODO: maybe here fix with running into walls?
             if self.frame_index >= 3:
                 self.frame_index = 0
             self.image = self.states[self.size][self.state][int(self.frame_index)]
@@ -297,7 +304,10 @@ class Mariusz(Sprite):
         if time() - self.upgrade_timer >= 0.1:
             self.upgrade_timer = time()
             self.upgrade_index += 1
-            if self.upgrade_index >= 10:
+
+            if self.upgrade_index <= 9:
+                self.image = self.states[0]['upgrade'][self.upgrade_sequence[self.upgrade_index]]
+            else:
                 self.upgrade_index = 0
                 self.is_upgrading = False
 
