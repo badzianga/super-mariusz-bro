@@ -51,8 +51,7 @@ class Controller:
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
-        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'),
-                             Koopa(224, 144))
+        self.enemies = Group(Koopa(224, 144))
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'))
         self.powerups = Group()
@@ -74,7 +73,7 @@ class Controller:
 
         # temporary, I'm using it here only during development
         music.load('music/smb_supermariobros.mp3')
-        music.play(-1)
+        # music.play(-1)
 
     def add_powerup(self, position: tuple) -> None:
         """Generate proper power-up and add it to power-ups group."""
@@ -184,7 +183,8 @@ class Controller:
         self.hud.update_coin_indicator()
 
         # draw objects onto screen Surface
-        self.enemies.draw(self.screen)
+        for enemy in self.enemies:
+            enemy.draw(self.screen)
         self.floating_points.draw(self.screen)
         self.player.draw()
         self.hud.draw()

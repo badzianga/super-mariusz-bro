@@ -6,6 +6,7 @@ from time import time
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.sprite import Group, Sprite
+from pygame.surface import Surface
 from pygame.transform import flip as flip_image
 
 
@@ -19,6 +20,7 @@ class Goomba(Sprite):
         super().__init__()
 
         self.is_alive = True  # used in updating and player's collision check
+        self.type = 'goomba'
 
         # animations and visual stuff
         self.frame = 0
@@ -93,13 +95,15 @@ class Goomba(Sprite):
 
     def death_state(self) -> None:
         """Change alive state of the enemy to false and make it squished."""
-        # self.frame = 0  # isn't really necessary
         self.last_time = time()
         self.image = self.images['die']
         self.is_alive = False
 
+    def draw(self, screen: Surface) -> None:
+        screen.blit(self.image, self.rect)
+
     def update(self, dt: float, tiles: Group, enemies: Group) -> None:
-        """Update enemy image, and position, disappear it after squished."""
+        """Update enemy image and position, disappear it after squished."""
         if self.is_alive:  # alive state - update walking image
             if time() - self.last_time >= self.animation_speed:
                 self.last_time = time()
@@ -134,7 +138,9 @@ class Koopa(Goomba):
         super().__init__(x, y, 'red')
 
         # only differences from Goomba
+        self.type = 'koopa'
         self.spinning = False
+        self.state = 'walk'
         self.images = {
             'walk': [
                 load_image(f'img/koopa_walk_{i}.png').convert_alpha()
@@ -145,12 +151,43 @@ class Koopa(Goomba):
         }
         self.flip = False
         self.image = self.images['walk'][0]
-        self.rect = self.image.get_rect(topleft=(x, y))
+        # I'm not overriding self.rect because I want 16x16, not 16x24
+
+    def death_state(self) -> None:
+        self.image = self.images['die']
+        self.state = 'die'
+
+    def spin(self, to_left: bool) -> None:
+        self.spinning = True
+        self.speed.x = -6 if to_left else 6
+
+    def draw(self, screen: Surface) -> None:
+        if self.state == 'walk':
+            screen.blit(flip_image(self.image, self.flip, False),
+                        (self.rect.x, self.rect.y - 8))
+        else:
+            screen.blit(flip_image(self.image, self.flip, False),
+                        (self.rect.x, self.rect.y))
 
     def update(self, dt: float, tiles: Group, enemies: Group) -> None:
-        super().update(dt, tiles, enemies)
+        """Update enemy image and position."""
+        if self.state == 'walk':  # alive state - update walking image
+            if time() - self.last_time >= self.animation_speed:
+                self.last_time = time()
+                self.frame += 1
+                if self.frame >= 2:
+                    self.frame = 0
+            self.image = self.images['walk'][self.frame]
 
-        # TODO: I think it's flipped during every frame but I'm not sure
-        # I will leave it here for now
-        self.flip = self.speed.x > 0
-        self.image = flip_image(self.image, self.flip, False)
+        if self.state == 'walk' or self.spinning:
+            # change horizontal position
+            self.move_horizontally(dt)
+            self.check_horizontal_collisions(tiles)
+
+            # change vertical position
+            self.move_vertically(dt)
+            self.check_vertical_collisions(tiles)
+
+            self.check_enemy_collisions(enemies)
+
+            self.flip = self.speed.x > 0

@@ -62,6 +62,7 @@ class Mariusz(Sprite):
         self.stomp_sound = Sound('sfx/smb_stomp.wav')
         self.powerup_sound = Sound('sfx/smb_powerup.wav')
         self.pipe_sound = Sound('sfx/smb_pipe.wav')
+        self.kick_sound = Sound('sfx/smb_kick.wav')
 
         self.in_air = False
         self.crouching = False
@@ -257,6 +258,7 @@ class Mariusz(Sprite):
             self.add_coin()
 
     def check_enemy_collisions(self, enemies: Group) -> None:
+        # TODO: player should can kill enemies when invincible
         if self.invincible:
             return
 
@@ -269,6 +271,23 @@ class Mariusz(Sprite):
                 if not enemy.is_alive:
                     continue
 
+                # whole exception for Koopa which is kinda complicated
+                if enemy.type == 'koopa':
+                    if enemy.state != 'walk' and not enemy.spinning:
+                        self.kick_sound.play()
+                        if self.in_air:
+                            self.speed.y = -6
+                            self.rect.bottom = enemy.rect.top
+                        else:
+                            if self.speed.x > 0:  # touching left enemy side
+                                self.rect.right = enemy.rect.left
+                            else:  # touching right enemy side
+                                self.rect.left = enemy.rect.right
+                            # TODO: there should also be points multiplier
+                        self.add_points(400)
+                        enemy.spin(self.rect.centerx >= enemy.rect.centerx)
+                        return
+
                 enemy_center = enemy.rect.centery
                 enemy_top = enemy.rect.top
                 if enemy_top < player_bottom < enemy_center and self.speed.y >= 0:
@@ -278,6 +297,7 @@ class Mariusz(Sprite):
                     self.add_points(100)
                     # TODO: points multiplier from combo
                     enemy.death_state()
+                    return  # TODO: for testing
                 else:
                     if self.size == 0:
                         self.kill()
