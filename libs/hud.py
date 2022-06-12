@@ -1,5 +1,3 @@
-# TODO: time position when <100 and then <10
-
 from math import ceil
 from time import time
 
@@ -106,7 +104,7 @@ class Hud:
             self.last_time = time()
 
         # display time
-        surf = self.font.render(str(self.timer), False, WHITE)
+        surf = self.font.render(str(self.timer).zfill(3), False, WHITE)
         self.surface.blit(surf, (192, 8))
 
         # display world
