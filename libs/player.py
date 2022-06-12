@@ -285,7 +285,7 @@ class Mariusz(Sprite):
                                 self.rect.left = enemy.rect.right
                             # TODO: there should also be points multiplier
                         self.add_points(400)
-                        enemy.spin(self.rect.centerx >= enemy.rect.centerx)
+                        enemy.spin(self.rect.centerx <= enemy.rect.centerx)
                         return
 
                 enemy_center = enemy.rect.centery

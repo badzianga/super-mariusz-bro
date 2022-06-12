@@ -157,9 +157,9 @@ class Koopa(Goomba):
         self.image = self.images['die']
         self.state = 'die'
 
-    def spin(self, to_left: bool) -> None:
+    def spin(self, to_right: bool) -> None:
         self.spinning = True
-        self.speed.x = -6 if to_left else 6
+        self.speed.x = 6 if to_right else -6
 
     def draw(self, screen: Surface) -> None:
         if self.state == 'walk':
