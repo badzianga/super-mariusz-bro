@@ -6,6 +6,7 @@ from time import time
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.sprite import Group, Sprite
+from pygame.transform import flip as flip_image
 
 
 class Goomba(Sprite):
@@ -132,7 +133,7 @@ class Koopa(Goomba):
         """Initialize enemy - Koopa."""
         super().__init__(x, y, 'red')
 
-        # only differences for now are these two variables
+        # only differences from Goomba
         self.spinning = False
         self.images = {
             'walk': [
@@ -142,5 +143,14 @@ class Koopa(Goomba):
             'die': load_image('img/koopa_die_0.png').convert_alpha(),
             'reviving': load_image('img/koopa_reviving_0.png').convert_alpha()
         }
+        self.flip = False
         self.image = self.images['walk'][0]
         self.rect = self.image.get_rect(topleft=(x, y))
+
+    def update(self, dt: float, tiles: Group, enemies: Group) -> None:
+        super().update(dt, tiles, enemies)
+
+        # TODO: I think it's flipped during every frame but I'm not sure
+        # I will leave it here for now
+        self.flip = self.speed.x > 0
+        self.image = flip_image(self.image, self.flip, False)
