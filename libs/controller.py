@@ -51,7 +51,8 @@ class Controller:
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
-        self.enemies = Group(Koopa(224, 144))
+        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'),
+                             Koopa(224, 144))
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'))
         self.powerups = Group()

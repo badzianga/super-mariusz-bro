@@ -37,6 +37,10 @@ class Goomba(Sprite):
         self.last_time = time()
         self.image = self.images['walk'][0]
 
+        # TODO: maybe change method of killing enemies with spinning Koopa
+        # to be honest, it's only used in Koopa, but it's easier to add it here
+        self.spinning = False
+
         # positioning and movement stuff
         self.rect = self.image.get_rect(topleft=(x, y))
         self.pos = Vector2(x, y)
@@ -86,8 +90,17 @@ class Goomba(Sprite):
         for enemy in enemies:
             if self == enemy:
                 continue
-            
+
             if self.rect.colliderect(enemy.rect):
+                if enemy.type == KOOPA and enemy.spinning:
+                    # TODO: death animation, add points
+                    self.kill()
+                    return
+                elif self.type == KOOPA and self.spinning:
+                    # TODO: death animation, add points
+                    enemy.kill()
+                    return
+                        
                 if self.speed.x > 0:  # touching left side of the other enemy
                     self.rect.right = enemy.rect.left
                 else:  # touching right side of the other enemy
