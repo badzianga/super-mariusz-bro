@@ -9,7 +9,7 @@ from .coin import Coin, SpinningCoin
 from .constants import BG_COLOR
 from .debris import Debris
 from .debug import Debug
-from .enemies import Goomba
+from .enemies import Goomba, Koopa
 from .hud import Hud
 from .level import Level
 from .player import Mariusz
@@ -51,7 +51,8 @@ class Controller:
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
-        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'))
+        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'),
+                             Koopa(224, 144))
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'))
         self.powerups = Group()

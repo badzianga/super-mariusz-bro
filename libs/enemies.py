@@ -6,11 +6,12 @@ from time import time
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.sprite import Group, Sprite
-from pygame.surface import Surface
 
 
 class Goomba(Sprite):
-    """First and most basic enemy. It can walk and collide with map."""
+    """
+    First and most basic enemy. It can walk and collide with map and enemies.
+    """
 
     def __init__(self, x: int, y: int, theme: str) -> None:
         """Initialize enemy - Goomba."""
@@ -34,7 +35,7 @@ class Goomba(Sprite):
         # positioning and movement stuff
         self.rect = self.image.get_rect(topleft=(x, y))
         self.pos = Vector2(x, y)
-        self.speed = Vector2(1, 0)
+        self.speed = Vector2(-1, 0)
 
     def move_horizontally(self, dt: float) -> None:
         "Change horizontal position of the enemy."
@@ -119,3 +120,27 @@ class Goomba(Sprite):
         self.check_vertical_collisions(tiles)
 
         self.check_enemy_collisions(enemies)
+
+
+class Koopa(Goomba):
+    """
+    Second basic enemy. It can walk, collde with map and enemies and kill other
+    enemies when jumped on again.
+    """
+
+    def __init__(self, x: int, y: int) -> None:
+        """Initialize enemy - Koopa."""
+        super().__init__(x, y, 'red')
+
+        # only differences for now are these two variables
+        self.spinning = False
+        self.images = {
+            'walk': [
+                load_image(f'img/koopa_walk_{i}.png').convert_alpha()
+                for i in range(2)
+            ],
+            'die': load_image('img/koopa_die_0.png').convert_alpha(),
+            'reviving': load_image('img/koopa_reviving_0.png').convert_alpha()
+        }
+        self.image = self.images['walk'][0]
+        self.rect = self.image.get_rect(topleft=(x, y))
