@@ -93,7 +93,6 @@ class Mariusz(Sprite):
     def upgrade(self) -> None:
         self.powerup_sound.play()
         if self.size != 2:
-            self.speed.y = 0  # TODO: it could be only temporary
             self.size += 1
             # TODO: don't change rect size when self.size from 1 to 2
             self.rect.inflate_ip(0, 16)
@@ -104,11 +103,6 @@ class Mariusz(Sprite):
 
     def downgrade(self) -> None:
         self.pipe_sound.play()
-        self.speed.y = 0  # TODO: it could be only temporary
-        self.size = 0
-        self.rect.inflate_ip(0, -16)
-        self.rect.y += 8
-        self.pos.y += 8
 
         self.is_upgrading = True
         self.invincible = True
@@ -300,7 +294,36 @@ class Mariusz(Sprite):
                 self.upgrade()
                 self.add_points(1000)
 
+    def downgrade_animation(self) -> None:
+        # I really don't want to but I have to, so there goes spaghetti
+        if time() - self.upgrade_timer >= 0.1:
+            self.upgrade_timer = time()
+            self.upgrade_index -= 1
+
+            if self.upgrade_index >= 0:
+                self.image = self.states[0]['upgrade'][self.upgrade_sequence[self.upgrade_index]]
+            else:
+                self.is_upgrading = False
+
+                # change size of Mariusz
+                self.size = 0
+                self.rect.inflate_ip(0, -16)
+                self.rect.y += 8
+                self.pos.y += 8
+
+                # after animation set images to half-invisible
+                self.states[0]['idle'].set_alpha(128)
+                self.states[0]['jump'].set_alpha(128)
+                self.states[0]['brake'].set_alpha(128)
+                for image in self.states[0]['run']:
+                    image.set_alpha(128)
+
+
     def upgrade_animation(self) -> None:
+        if self.invincible:
+            self.downgrade_animation()
+            return
+
         if time() - self.upgrade_timer >= 0.1:
             self.upgrade_timer = time()
             self.upgrade_index += 1
@@ -308,16 +331,7 @@ class Mariusz(Sprite):
             if self.upgrade_index <= 9:
                 self.image = self.states[0]['upgrade'][self.upgrade_sequence[self.upgrade_index]]
             else:
-                self.upgrade_index = 0
                 self.is_upgrading = False
-
-                # after animation set images to half-invisible
-                if self.invincible:
-                    self.states[0]['idle'].set_alpha(128)
-                    self.states[0]['jump'].set_alpha(128)
-                    self.states[0]['brake'].set_alpha(128)
-                    for image in self.states[0]['run']:
-                        image.set_alpha(128)
 
     def die_animation(self, dt: float) -> None:
         if time() - self.die_timer >= 0.4: 
