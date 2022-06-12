@@ -339,9 +339,10 @@ class Mariusz(Sprite):
         music.load('music/smb_mariodie.wav')
         music.play()
         self.change_state('die')
+        if self.size > 0:
+            self.rect.y += 16  # TODO: this might be bad in the future
+            self.pos.y += 16  # TODO: this too
         self.size = 0
-        self.rect.y += 16  # TODO: this might be bad in the future
-        self.pos.y += 16  # TODO: this too
         self.image = self.states[self.size]['die']
         self.is_alive = False
         self.speed.x = 0
