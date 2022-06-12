@@ -5,6 +5,7 @@ from time import time
 
 from pygame.image import load as load_image
 from pygame.math import Vector2
+from pygame.mixer import Sound
 from pygame.sprite import Group, Sprite
 from pygame.surface import Surface
 from pygame.transform import flip as flip_image
@@ -40,6 +41,8 @@ class Goomba(Sprite):
         # TODO: maybe change method of killing enemies with spinning Koopa
         # to be honest, it's only used in Koopa, but it's easier to add it here
         self.spinning = False
+        # sound when killing other enemies - also Koopa exclusive
+        self.kick_sound = Sound('sfx/smb_kick.wav')
 
         # positioning and movement stuff
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -94,10 +97,12 @@ class Goomba(Sprite):
             if self.rect.colliderect(enemy.rect):
                 if enemy.type == KOOPA and enemy.spinning:
                     # TODO: death animation, add points
+                    enemy.kick_sound.play()
                     self.kill()
                     return
                 elif self.type == KOOPA and self.spinning:
                     # TODO: death animation, add points
+                    self.kick_sound.play()
                     enemy.kill()
                     return
                         
