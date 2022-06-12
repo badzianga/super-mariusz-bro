@@ -51,7 +51,7 @@ class Controller:
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
-        self.enemies = Group(Goomba(176, 144, 'red'))
+        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'))
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'))
         self.powerups = Group()
@@ -73,7 +73,7 @@ class Controller:
 
         # temporary, I'm using it here only during development
         music.load('music/smb_supermariobros.mp3')
-        # music.play(-1)
+        music.play(-1)
 
     def add_powerup(self, position: tuple) -> None:
         """Generate proper power-up and add it to power-ups group."""
@@ -153,7 +153,7 @@ class Controller:
         if self.player.is_alive and not self.player.is_upgrading:
             # update positions
             self.powerups.update(dt, self.level.tiles)
-            self.enemies.update(dt, self.level.tiles)
+            self.enemies.update(dt, self.level.tiles, self.enemies)
             self.player.update(dt, self.coins_group, self.level.tiles,
                                self.enemies, self.powerups)
 

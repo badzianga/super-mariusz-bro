@@ -75,6 +75,20 @@ class Goomba(Sprite):
                     self.speed.y = 0
                 return  # finish looking for collisions
 
+    def check_enemy_collisions(self, enemies: Group) -> None:
+        """Check collisions with other enemies."""
+        for enemy in enemies:
+            if self == enemy:
+                continue
+            
+            if self.rect.colliderect(enemy.rect):
+                if self.speed.x > 0:  # touching left side of the other enemy
+                    self.rect.right = enemy.rect.left
+                else:  # touching right side of the other enemy
+                    self.rect.left = enemy.rect.right
+                self.speed *= -1
+                enemy.speed *= -1
+
     def death_state(self) -> None:
         """Change alive state of the enemy to false and make it squished."""
         # self.frame = 0  # isn't really necessary
@@ -82,7 +96,7 @@ class Goomba(Sprite):
         self.image = self.images['die']
         self.is_alive = False
 
-    def update(self, dt: float, tiles: Group) -> None:
+    def update(self, dt: float, tiles: Group, enemies: Group) -> None:
         """Update enemy image, and position, disappear it after squished."""
         if self.is_alive:  # alive state - update walking image
             if time() - self.last_time >= self.animation_speed:
@@ -103,3 +117,5 @@ class Goomba(Sprite):
         # change vertical position
         self.move_vertically(dt)
         self.check_vertical_collisions(tiles)
+
+        self.check_enemy_collisions(enemies)

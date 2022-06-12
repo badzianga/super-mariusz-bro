@@ -1,6 +1,7 @@
 # TODO: problem with animation when walking into walls
 # TODO: running animation when jumping (extremum)
 # TODO: disable constantly jumping when holding jump key
+# TODO: player can die when jumping on enemy touching another enemy
 
 from time import time
 from types import FunctionType
@@ -276,6 +277,7 @@ class Mariusz(Sprite):
                 if enemy_top < player_bottom < enemy_center and self.speed.y >= 0:
                     self.stomp_sound.play()
                     self.speed.y = -6
+                    self.rect.bottom = enemy_top
                     self.add_points(100)
                     # TODO: points multiplier from combo
                     enemy.death_state()
