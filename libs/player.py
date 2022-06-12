@@ -6,7 +6,6 @@
 from time import time
 from types import FunctionType
 
-from pygame import draw
 from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_a, K_z
 from pygame.image import load as load_image
 from pygame.key import get_pressed
@@ -15,8 +14,6 @@ from pygame.mixer import Sound, music
 from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
-
-from libs.constants import WHITE
 
 
 class Mariusz(Sprite):
@@ -320,7 +317,6 @@ class Mariusz(Sprite):
                 for image in self.states[0]['run']:
                     image.set_alpha(128)
 
-
     def upgrade_animation(self) -> None:
         if self.invincible:
             self.downgrade_animation()
@@ -354,7 +350,6 @@ class Mariusz(Sprite):
             self.screen.blit(flip(self.image, True, False), self.rect)
         else:
             self.screen.blit(self.image, self.rect)
-        draw.rect(self.screen, WHITE, self.rect, 1)
 
     def update(self, dt: float, coins: Group, tiles: Group,
                enemies: Group, mushrooms: Group) -> None:
