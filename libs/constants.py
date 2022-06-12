@@ -11,3 +11,7 @@ BG_COLOR = (92, 148, 252)
 RED = (255, 0, 0)
 TRANSPARENT = (0, 0, 0, 0)
 WHITE = (255, 255, 255)
+
+# enemies' types
+GOOMBA = 0
+KOOPA = 1

@@ -9,6 +9,8 @@ from pygame.sprite import Group, Sprite
 from pygame.surface import Surface
 from pygame.transform import flip as flip_image
 
+from .constants import GOOMBA, KOOPA
+
 
 class Goomba(Sprite):
     """
@@ -20,7 +22,7 @@ class Goomba(Sprite):
         super().__init__()
 
         self.is_alive = True  # used in updating and player's collision check
-        self.type = 'goomba'
+        self.type = GOOMBA
 
         # animations and visual stuff
         self.frame = 0
@@ -138,7 +140,7 @@ class Koopa(Goomba):
         super().__init__(x, y, 'red')
 
         # only differences from Goomba
-        self.type = 'koopa'
+        self.type = KOOPA
         self.spinning = False
         self.state = 'walk'
         self.images = {
@@ -160,6 +162,10 @@ class Koopa(Goomba):
     def spin(self, to_right: bool) -> None:
         self.spinning = True
         self.speed.x = 6 if to_right else -6
+
+    def stop_spinning(self) -> None:
+        self.spinning = False
+        self.speed.x = self.speed.x // 6
 
     def draw(self, screen: Surface) -> None:
         if self.state == 'walk':

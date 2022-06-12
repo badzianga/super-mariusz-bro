@@ -15,6 +15,8 @@ from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
 
+from .constants import GOOMBA, KOOPA
+
 
 class Mariusz(Sprite):
     def __init__(self, screen: Surface, position: tuple, size: int,
@@ -272,18 +274,19 @@ class Mariusz(Sprite):
                     continue
 
                 # whole exception for Koopa which is kinda complicated
-                if enemy.type == 'koopa':
+                if enemy.type == KOOPA:
                     if enemy.state != 'walk' and not enemy.spinning:
                         self.kick_sound.play()
                         if self.in_air:
                             self.speed.y = -6
                             self.rect.bottom = enemy.rect.top
+                            self.pos.y = self.rect.y
                         else:
                             if self.speed.x > 0:  # touching left enemy side
                                 self.rect.right = enemy.rect.left
                             else:  # touching right enemy side
                                 self.rect.left = enemy.rect.right
-                            # TODO: there should also be points multiplier
+                            self.pos.x = self.rect.x
                         self.add_points(400)
                         enemy.spin(self.rect.centerx <= enemy.rect.centerx)
                         return
@@ -291,9 +294,19 @@ class Mariusz(Sprite):
                 enemy_center = enemy.rect.centery
                 enemy_top = enemy.rect.top
                 if enemy_top < player_bottom < enemy_center and self.speed.y >= 0:
+                    # more Koopa exception - this one is stopping spinning Koopa
+                    if enemy.type == KOOPA:
+                        if enemy.spinning:
+                            self.kick_sound.play()
+                            enemy.stop_spinning()
+                            self.speed.y = -6
+                            self.rect.bottom = enemy_top
+                            self.pos.y = self.rect.y
+                            return
                     self.stomp_sound.play()
                     self.speed.y = -6
                     self.rect.bottom = enemy_top
+                    self.pos.y = self.rect.y
                     self.add_points(100)
                     # TODO: points multiplier from combo
                     enemy.death_state()
