@@ -1,5 +1,5 @@
-# TODO: enemy should collide with other enemies
 # TODO: Mario shouldn't die when jumping on two overlapping enemies
+# TODO: fix Koopa points
 
 from time import time
 
@@ -158,14 +158,19 @@ class Koopa(Goomba):
     def death_state(self) -> None:
         self.image = self.images['die']
         self.state = 'die'
+        self.last_time = time()
 
     def spin(self, to_right: bool) -> None:
         self.spinning = True
         self.speed.x = 6 if to_right else -6
+        # just to be sure, why not
+        self.state = 'die'
+        self.image = self.images['die'] 
 
     def stop_spinning(self) -> None:
         self.spinning = False
         self.speed.x = self.speed.x // 6
+        self.last_time = time()
 
     def draw(self, screen: Surface) -> None:
         if self.state == 'walk':
@@ -184,6 +189,15 @@ class Koopa(Goomba):
                 if self.frame >= 2:
                     self.frame = 0
             self.image = self.images['walk'][self.frame]
+        elif not self.spinning:  # died or reviving
+            time_diff = time() - self.last_time
+            if time_diff >= 5:
+                self.state = 'walk'
+                self.image = self.images['walk'][self.frame]
+                self.last_time = time()
+            elif time_diff >= 4:
+                self.state = 'reviving'
+                self.image = self.images['reviving']
 
         if self.state == 'walk' or self.spinning:
             # change horizontal position
