@@ -1,5 +1,9 @@
-from pygame.sprite import Sprite, Group
+# TODO: powerups appear animations
+
+from time import time
+
 from pygame.math import Vector2
+from pygame.sprite import Group, Sprite
 from pygame.surface import Surface
 
 
@@ -56,20 +60,32 @@ class Mushroom(Sprite):
         self.check_vertical_collisions(tiles)
 
 
+class FireFlower(Sprite):
+    def __init__(self, images: tuple, position: tuple) -> None:
+        super().__init__()
+
+        self.frame = 0
+        self.images = images
+        self.image = self.images[0]
+        self.rect = self.image.get_rect(topleft=position)
+        self.animation_speed = 0.05
+        self.last_time = time()
+
+    def update(self, dt: float, tiles: Group) -> None:
+        if time() - self.last_time >= self.animation_speed:
+            self.last_time = time()
+            self.frame += 1
+            if self.frame > 3:
+                self.frame = 0
+            self.image = self.images[self.frame]
+
+
 class OneUP(Mushroom):
     def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__(image, position)
 
 
 class Star(Sprite):
-    def __init__(self, image: Surface, position: tuple) -> None:
-        super().__init__()
-
-        self.image = image
-        self.rect = self.image.get_rect(topleft=position)
-
-
-class FireFlower(Sprite):
     def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__()
 

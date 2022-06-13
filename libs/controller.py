@@ -1,3 +1,5 @@
+# TODO: self.size variable which holds player.size between levels
+
 from pygame import Surface
 from pygame.image import load as load_image
 from pygame.math import Vector2
@@ -14,7 +16,7 @@ from .hud import Hud
 from .level import Level
 from .player import Mariusz
 from .points import Points
-from .powerups import Mushroom
+from .powerups import FireFlower, Mushroom
 
 
 class Controller:
@@ -33,20 +35,23 @@ class Controller:
         self.coins = 0
         self.points = 0
         self.world = 1
-        self.size = 0  # 0 - small, 1 - large, 2 - fire
 
         # most of the images will be loaded here in the future
         self.images = {
             'mushroom': load_image('img/mushroom.png'),
             '1up': load_image('img/1up_mushroom.png'),
-            'debris': load_image('img/red/debris.png')
+            'debris': load_image('img/red/debris.png'),
+            'fire_flower': tuple([
+                load_image(f'img/flower_{i}.png').convert_alpha()
+                for i in range(4)
+            ])
         }
 
         # the most important objects
         self.level = Level(screen)
         self.level.load_level(self.create_spinning_coin, self.add_coin,
                               self.create_debris, self.add_powerup)
-        self.player = Mariusz(screen, (32, 64), self.size, self.add_coin,
+        self.player = Mariusz(screen, (32, 64), 0, self.add_coin,
                               self.add_points)
         self.hud = Hud(screen, self.world, 'red')
 
@@ -78,8 +83,10 @@ class Controller:
 
     def add_powerup(self, position: tuple) -> None:
         """Generate proper power-up and add it to power-ups group."""
-        if self.size == 0:
+        if self.player.size == 0:
             self.powerups.add(Mushroom(self.images['mushroom'], position))
+        else:
+            self.powerups.add(FireFlower(self.images['fire_flower'], position))
 
     def add_coin(self) -> None:
         """Add coin and handle all its' consequences."""
