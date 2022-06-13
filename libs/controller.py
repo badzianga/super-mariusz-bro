@@ -12,6 +12,7 @@ from .constants import BG_COLOR
 from .debris import Debris
 from .debug import Debug
 from .enemies import Goomba, Koopa
+from .fireball import Fireball
 from .hud import Hud
 from .level import Level
 from .player import Mariusz
@@ -44,6 +45,10 @@ class Controller:
             'fire_flower': tuple([
                 load_image(f'img/flower_{i}.png').convert_alpha()
                 for i in range(4)
+            ]),
+            'fireball': tuple([
+                load_image(f'img/fireball_{i}.png').convert_alpha()
+                for i in range(7)
             ])
         }
 
@@ -52,7 +57,7 @@ class Controller:
         self.level.load_level(self.create_spinning_coin, self.add_coin,
                               self.create_debris, self.add_powerup)
         self.player = Mariusz(screen, (32, 64), 0, self.add_coin,
-                              self.add_points)
+                              self.add_points, self.create_fireball)
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
@@ -61,11 +66,13 @@ class Controller:
         self.floating_points = Group()
         self.coins_group = Group(Coin((83, 184), 'red'))
         self.powerups = Group()
+        self.fireballs = Group()
 
         # sounds
         self.pause_sound = Sound('sfx/smb_pause.wav')
         self.coin_sound = Sound('sfx/smb_coin.wav')
         self.oneup_sound = Sound('sfx/smb_1-up.wav')
+        self.fireball_sound = Sound('sfx/smb_fireball.wav')
 
         # debug object, used to display useful info during development
         self.debug = Debug(screen, clock)
@@ -108,6 +115,8 @@ class Controller:
         # breaking bricks wouldn't create points sprite
         self.points += amount
         if create_sprite:
+            # TODO: position above killed enemy, not player
+            # I can add position as argument, but it's for later
             pos = list(self.player.rect.topleft)
             pos[0] -= 8
             self.create_floating_points(pos, amount)
@@ -115,6 +124,11 @@ class Controller:
     def create_floating_points(self, position: tuple, amount: int) -> None:
         """Create floating points sprite and add it to the group."""
         self.floating_points.add(Points(position, amount))
+
+    def create_fireball(self, position: tuple, direction: int) -> None:
+        self.fireballs.add(Fireball(self.images['fireball'], position,
+                                    direction, self.add_points))
+        self.fireball_sound.play()
 
     def add_life(self) -> None:
         """Add life and play 1UP sound."""
@@ -161,6 +175,7 @@ class Controller:
         if self.player.is_alive and not self.player.is_upgrading:
             # update positions
             self.powerups.update(dt, self.level.tiles)
+            self.fireballs.update(dt, self.level.tiles, self.enemies)
             self.enemies.update(dt, self.level.tiles, self.enemies)
             self.player.update(dt, self.coins_group, self.level.tiles,
                                self.enemies, self.powerups)
@@ -199,6 +214,7 @@ class Controller:
         self.coins_group.update(self.screen)
         self.powerups.draw(self.screen)
         self.level.tiles.update()
+        self.fireballs.draw(self.screen)
 
         # temporary, I'm using it only during development
         self.debug.draw()

@@ -20,7 +20,8 @@ from .constants import KOOPA
 
 class Mariusz(Sprite):
     def __init__(self, screen: Surface, position: tuple, size: int,
-                 add_coin: FunctionType, add_points: FunctionType) -> None:
+                 add_coin: FunctionType, add_points: FunctionType,
+                 create_fireball: FunctionType) -> None:
         super().__init__()
 
         self.screen = screen
@@ -71,6 +72,7 @@ class Mariusz(Sprite):
 
         self.add_coin = add_coin
         self.add_points = add_points
+        self.create_fireball = create_fireball
 
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
         self.large_jump_sound = Sound('sfx/smb_jump-super.wav')
@@ -103,6 +105,15 @@ class Mariusz(Sprite):
         if self.state == 'jump':
             self.state = 'run'
             self.frame_index = 0
+
+    def shoot(self) -> None:
+        if self.size < 2:
+            return
+
+        if self.flip:
+            self.create_fireball(self.rect.midleft, -1)
+        else:
+            self.create_fireball(self.rect.midright, 1)
 
     def upgrade(self) -> None:
         self.powerup_sound.play()
@@ -156,6 +167,9 @@ class Mariusz(Sprite):
 
     def move_horizontally(self, dt: float) -> None:
         keys = get_pressed()
+
+        if keys[K_a]:
+            self.shoot()
 
         if keys[K_a]:
             max_speed = 4
