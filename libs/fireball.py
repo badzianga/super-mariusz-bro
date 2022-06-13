@@ -4,6 +4,7 @@ from types import FunctionType
 from pygame.math import Vector2
 from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
+from pygame.mixer import Sound
 
 from .constants import KOOPA
 
@@ -24,6 +25,8 @@ class Fireball(Sprite):
 
         self.add_points = add_points
 
+        self.kick_sound = Sound('sfx/smb_kick.wav')
+
     def move_horizontally(self, dt: float) -> None:
         "Change horizontal position of the fireball."
         self.pos.x += self.speed.x * dt
@@ -41,6 +44,7 @@ class Fireball(Sprite):
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
                 # TODO: explosion animation
+                self.kick_sound.play()
                 self.kill()
 
     def check_vertical_collisions(self, tiles: Group) -> None:
@@ -65,6 +69,7 @@ class Fireball(Sprite):
         if enemy_collisions:
             enemy = enemy_collisions[0]
             # TODO: explosion animation
+            self.kick_sound.play()
             self.kill()
 
             if enemy.type == KOOPA:  # points from Koopa
