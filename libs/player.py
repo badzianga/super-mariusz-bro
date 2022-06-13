@@ -1,7 +1,7 @@
 # TODO: problem with animation when walking into walls
 # TODO: running animation when jumping (extremum)
 # TODO: disable constantly jumping when holding jump key
-# TODO: player can die when jumping on enemy touching another enemy
+# TODO: player can't kill enemies when invincible
 
 from time import time
 from types import FunctionType
@@ -15,7 +15,7 @@ from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
 
-from .constants import GOOMBA, KOOPA
+from .constants import KOOPA
 
 
 class Mariusz(Sprite):

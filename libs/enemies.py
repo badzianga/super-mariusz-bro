@@ -1,4 +1,3 @@
-# TODO: Mario shouldn't die when jumping on two overlapping enemies
 # TODO: fix Koopa points
 
 from time import time
