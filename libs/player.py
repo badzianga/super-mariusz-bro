@@ -38,7 +38,12 @@ class Mariusz(Sprite):
                 'die': load_image('img/die_0.png').convert_alpha(),
                 'brake': load_image('img/brake_0.png').convert_alpha(),
                 'upgrade': [load_image(f'img/upgrade_{i}.png').convert_alpha()
-                            for i in range(3)]
+                            for i in range(3)],
+                'upgrade_2': [
+                    load_image('img/large_idle_0.png').convert_alpha(),
+                    load_image('img/between_idle_0.png').convert_alpha(),
+                    load_image('img/fire_idle_0.png').convert_alpha()
+                ]
             },
             1: {
                 'idle': load_image('img/large_idle_0.png').convert_alpha(),
@@ -80,7 +85,7 @@ class Mariusz(Sprite):
         self.die_timer = 0
         self.is_alive = True
 
-        self.size = 0
+        self.size = 0  # 0 - small, 1 - large, 2 - fire
         self.upgrade_timer = 0
         self.upgrade_sequence = (0, 1, 0, 1, 0, 1, 2, 0, 1, 2)
         self.upgrade_index = 0
@@ -101,14 +106,16 @@ class Mariusz(Sprite):
 
     def upgrade(self) -> None:
         self.powerup_sound.play()
-        if self.size != 2:
+        if self.size == 0:
             self.size += 1
-            # TODO: don't change rect size when self.size from 1 to 2
             self.rect.inflate_ip(0, 16)
             self.rect.y -= 8
             self.pos.y -= 8
+        elif self.size == 1:
+            self.size += 1
+            self.upgrade_index = 0
 
-            self.is_upgrading = True
+        self.is_upgrading = True
 
     def downgrade(self) -> None:
         self.pipe_sound.play()
@@ -368,7 +375,10 @@ class Mariusz(Sprite):
             self.upgrade_index += 1
 
             if self.upgrade_index <= 9:
-                self.image = self.states[0]['upgrade'][self.upgrade_sequence[self.upgrade_index]]
+                if self.size == 1:
+                    self.image = self.states[0]['upgrade'][self.upgrade_sequence[self.upgrade_index]]
+                else:
+                    self.image = self.states[0]['upgrade_2'][self.upgrade_sequence[self.upgrade_index]]
             else:
                 self.is_upgrading = False
 
