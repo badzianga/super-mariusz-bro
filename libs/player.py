@@ -96,6 +96,8 @@ class Mariusz(Sprite):
         self.invincible = False
         self.hit_time = 0
 
+        self.last_shoot_time = 0
+
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
             self.state = new_state
@@ -109,6 +111,14 @@ class Mariusz(Sprite):
     def shoot(self) -> None:
         if self.size < 2:
             return
+
+        # TODO: proper shooting timing
+        if time() - self.last_shoot_time < 0.4:
+            return
+
+        # TODO: shoot only when just pressed button
+
+        self.last_shoot_time = time()
 
         if self.flip:
             self.create_fireball(self.rect.midleft, -1)
