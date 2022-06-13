@@ -47,6 +47,14 @@ class Mariusz(Sprite):
                 'jump': load_image('img/large_jump_0.png').convert_alpha(),
                 'crouch': load_image('img/large_crouch_0.png').convert_alpha(),
                 'brake': load_image('img/large_brake_0.png').convert_alpha()
+            },
+            2: {
+                'idle': load_image('img/fire_idle_0.png').convert_alpha(),
+                'run': [load_image(f'img/fire_run_{i}.png').convert_alpha()
+                        for i in range(3)],
+                'jump': load_image('img/fire_jump_0.png').convert_alpha(),
+                'crouch': load_image('img/fire_crouch_0.png').convert_alpha(),
+                'brake': load_image('img/fire_brake_0.png').convert_alpha()
             }
         }
         self.image = self.states[self.size]['idle']
