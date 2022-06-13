@@ -4,7 +4,7 @@ from pygame import Surface
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.mixer import Sound, music
-from pygame.sprite import Group, Sprite
+from pygame.sprite import Group
 from pygame.time import Clock
 
 from .coin import Coin, SpinningCoin
