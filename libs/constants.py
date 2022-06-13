@@ -8,6 +8,7 @@ PHYSICS_FPS = 30
 
 # colors
 BG_COLOR = (92, 148, 252)
+BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 TRANSPARENT = (0, 0, 0, 0)
 WHITE = (255, 255, 255)
@@ -15,3 +16,9 @@ WHITE = (255, 255, 255)
 # enemies' types
 GOOMBA = 0
 KOOPA = 1
+
+# states
+MENU_STATE = 0
+LOADING_STATE = 1
+LEVEL_STATE = 2
+GAME_OVER_STATE = 3

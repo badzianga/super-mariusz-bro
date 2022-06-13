@@ -6,7 +6,7 @@ from pygame.font import Font
 from pygame.image import load as load_image
 from pygame.surface import Surface
 
-from .constants import TRANSPARENT, WHITE
+from .constants import BLACK, TRANSPARENT, WHITE
 
 
 class Hud:
@@ -43,12 +43,26 @@ class Hud:
         self.world = None  # later it'll be a rendered Surface
         self.update_world(world)  # create Surface with world number
 
+        self.loading_screen_coin = load_image('img/blue/mini_coin_0.png').convert()
+        self.mariusz_sprite = load_image('img/idle_0.png').convert()
+        self.x_mark = load_image('img/x_mark.png')
+
         # HUD surface for easier positioning
         self.surface = Surface((224, 16), SRCALPHA)
+        # surface used for loading screen
+        # this one doesn't have to be transparent
+        self.loading_screen_surface = Surface((71, 41))
 
     def draw(self) -> None:
         """"Draw HUD onto screen."""
         self.screen.blit(self.surface, (16, 8))
+
+    def half_reset(self) -> None:
+        """Reset timer, set current coin frame to 0 and change coin ... TODO"""
+        self.timer = 400
+
+        self.coin_frame = 0
+        self.coin_timer = time()
 
     def update_world(self, world: int) -> None:
         """
@@ -68,20 +82,62 @@ class Hud:
     def update_coin_indicator(self) -> None:
         """
         Update coin indicator animation - it's a standalone method because it
-        should also be updated after death
+        should also be updated after death.
         """
         if time() - self.coin_timer >= self.coin_animation[self.coin_frame][1]:
             self.coin_timer = time()
             self.coin_frame += 1
             if self.coin_frame >= 4:
                 self.coin_frame = 0
+
         coin_surface = self.coin_surfs[self.coin_animation[self.coin_frame][0]]
         self.surface.blit(coin_surface, (72, 8))
 
+    def draw_loading_screen_exclusive(self, lifes: int) -> None:
+        """Draw different coin indicator and lifes."""
+        # indicator
+        self.surface.blit(self.loading_screen_coin, (72, 8))
+
+        # clear loading_screen-exclusive surface
+        self.loading_screen_surface.fill(BLACK)
+
+        # world
+        self.loading_screen_surface.blit(self.labels[1][0], (0, 0))
+        self.loading_screen_surface.blit(self.world, (48, 0))
+        self.loading_screen_surface.blit(self.mariusz_sprite, (8, 25))
+
+        # mariusz
+        self.surface.blit(self.mariusz_sprite, (80, 89))
+        self.loading_screen_surface.blit(self.x_mark, (33, 34))
+        surf = self.font.render(str(lifes), False, WHITE)
+        self.loading_screen_surface.blit(surf, (56, 32))
+
+        # draw surface onto screen
+        self.screen.blit(self.loading_screen_surface, (88, 72))
+
+    def draw_game_over_screen_exclusive(self) -> None:
+        """Draw different coin indicator and game over text."""
+        # indicator
+        self.surface.blit(self.loading_screen_coin, (72, 8))
+
+        # game over text
+        surf = self.font.render('GAME OVER', False, WHITE)
+        self.screen.blit(surf, (88, 120))
+
+    def update_timer(self) -> None:
+        """Update timer and draw it onto HUD surface."""
+        if time() - self.last_time >= 0.4:
+                self.timer = max(self.timer - 1, 0)
+                self.last_time = time()
+
+        # display time
+        surf = self.font.render(str(self.timer).zfill(3), False, WHITE)
+        self.surface.blit(surf, (192, 8))
+
     def update(self, coins: int, points: int) -> None:
         """
-        Update HUD content - world, coins, points and time. Coin indicator is
-        updated separately.
+        Update HUD content - world, coins and points. Coin indicator and timer
+        are updated separately.
         """
         # clear hud
         self.surface.fill(TRANSPARENT)
@@ -97,15 +153,6 @@ class Hud:
         # display points
         surf = self.font.render(str(points).zfill(6), False, WHITE)
         self.surface.blit(surf, (8, 8))
-        
-        # update timer
-        if time() - self.last_time >= 0.4:
-            self.timer = max(self.timer - 1, 0)
-            self.last_time = time()
-
-        # display time
-        surf = self.font.render(str(self.timer).zfill(3), False, WHITE)
-        self.surface.blit(surf, (192, 8))
 
         # display world
         self.surface.blit(self.world, (136 , 8))

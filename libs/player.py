@@ -15,13 +15,14 @@ from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
 
-from .constants import KOOPA
+from .constants import KOOPA, LOADING_STATE
 
 
 class Mariusz(Sprite):
     def __init__(self, screen: Surface, position: tuple, size: int,
                  add_coin: FunctionType, add_points: FunctionType,
-                 create_fireball: FunctionType) -> None:
+                 create_fireball: FunctionType, remove_life: FunctionType,
+                 switch_game_state: FunctionType) -> None:
         super().__init__()
 
         self.screen = screen
@@ -73,6 +74,8 @@ class Mariusz(Sprite):
         self.add_coin = add_coin
         self.add_points = add_points
         self.create_fireball = create_fireball
+        self.remove_life = remove_life
+        self.switch_game_state = switch_game_state
 
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
         self.large_jump_sound = Sound('sfx/smb_jump-super.wav')
@@ -410,6 +413,9 @@ class Mariusz(Sprite):
         if time() - self.die_timer >= 0.4: 
             self.move_vertically(dt)
 
+        if time() - self.die_timer >= 3.4:  # TODO: maybe change this time
+            self.switch_game_state(LOADING_STATE)
+
     def kill(self) -> None:
         music.load('music/smb_mariodie.wav')
         music.play()
@@ -422,6 +428,7 @@ class Mariusz(Sprite):
         self.is_alive = False
         self.speed.x = 0
         self.speed.y = -10
+        self.remove_life()
         self.die_timer = time()
 
     def draw(self) -> None:
