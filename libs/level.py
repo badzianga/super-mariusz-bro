@@ -35,6 +35,8 @@ class Level:
         self.cloud_img_0 = load_image('img/cloud_0.png').convert_alpha()
         self.cloud_img_1 = load_image('img/cloud_1.png').convert_alpha()
         self.cloud_img_2 = load_image('img/cloud_2.png').convert_alpha()
+        self.pipe_img_0 = load_image('img/pipe_0.png').convert_alpha()
+        self.pipe_img_1 = load_image('img/pipe_1.png').convert_alpha()
 
         # TODO: temporary?
         self.world = world
@@ -88,8 +90,20 @@ class Level:
                         self.coins.add(
                             Coin((x * 16 + 2, y * 16 + 8), 'red')
                         )
+                    case 13:  # pipe (top)
+                        self.tiles.add(
+                            Tile(self.pipe_img_0, (x * 16, y * 16 + 8))
+                        )
+                    case 14:  # pipe (top entrance)
+                        self.tiles.add(
+                            Tile(self.pipe_img_0, (x * 16, y * 16 + 8))
+                        )
+                    case 15:  # pipe (middle)
+                        self.tiles.add(
+                            Tile(self.pipe_img_1, (x * 16, y * 16 + 8))
+                        )
                     case 20:  # player
-                        player_pos = (x * 16 - 8, y * 16)
+                        player_pos = (x * 16 - 8, y * 16 + 8)
                     case 21:  # goomba
                         self.enemies.add(
                             Goomba(x * 16, y * 16 + 8, 'red')
