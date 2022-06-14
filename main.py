@@ -3,7 +3,8 @@ from time import time
 
 import pygame
 from pygame import mixer
-from pygame.constants import K_ESCAPE, K_F11, K_F12, K_RETURN, KEYDOWN, QUIT
+from pygame.constants import (K_ESCAPE, K_F11, K_F12, K_RETURN, KEYDOWN, QUIT,
+                              K_a, K_z)
 
 from libs.constants import (DISPLAY_SIZE, LEVEL_STATE, LOADING_STATE,
                             MENU_STATE, PHYSICS_FPS, SCREEN_SIZE)
@@ -37,7 +38,11 @@ def main() -> None:
                 pygame.quit()
                 exit()
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
+                if event.key == K_z:
+                    controller.player.can_jump = True
+                elif event.key == K_a:
+                    controller.player.can_shoot = True
+                elif event.key == K_ESCAPE:
                     pygame.quit()
                     exit()
                 elif event.key == K_RETURN:

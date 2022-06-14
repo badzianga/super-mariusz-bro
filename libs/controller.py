@@ -96,7 +96,7 @@ class Controller:
             LEVEL_STATE: self.level_state,
             GAME_OVER_STATE: self.game_over_state
         }
-        self.current_state = MENU_STATE
+        self.current_state = LEVEL_STATE
         self.switch_time = time()  # TODO: change this later
 
         # TODO: this might be temporary

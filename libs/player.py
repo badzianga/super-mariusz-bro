@@ -101,6 +101,13 @@ class Mariusz(Sprite):
 
         self.last_shoot_time = 0
 
+        # variables changed by main event handler
+        # I was too tired to think about something separated from this handler
+        # I don't want to call methods directly from handler because I'm not
+        # sure about order
+        self.can_shoot = False
+        self.can_jump = False
+
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
             self.state = new_state
@@ -182,9 +189,6 @@ class Mariusz(Sprite):
         keys = get_pressed()
 
         if keys[K_a]:
-            self.shoot()
-
-        if keys[K_a]:
             max_speed = 4
             brake_speed = 0.3
         else:
@@ -244,13 +248,14 @@ class Mariusz(Sprite):
 
         if not self.in_air:
             keys = get_pressed()
-            if keys[K_z]:  # jump
+            if self.can_jump:  # jump
                 if self.size == 0:
                     self.jump_sound.play()
                 else:
                     self.large_jump_sound.play()
                 self.speed.y = -8
                 self.in_air = True
+                self.can_jump = False
 
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
@@ -440,6 +445,10 @@ class Mariusz(Sprite):
     def update(self, dt: float, coins: Group, tiles: Group,
                enemies: Group, mushrooms: Group) -> None:
         self.remove_invincibility()
+
+        if self.can_shoot:
+            self.shoot()
+            self.can_shoot = False
 
         self.move_horizontally(dt)
         self.check_horizontal_collisions(tiles)
