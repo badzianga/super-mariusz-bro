@@ -60,19 +60,21 @@ class Controller:
         }
 
         # the most important objects
-        self.level = Level(screen)
-        self.level.load_level(self.create_spinning_coin, self.add_coin,
-                              self.create_debris, self.add_powerup)
-        self.player = Mariusz(screen, (32, 64), 0, self.add_coin,
+        self.level = Level(screen, '1-1')
+        player_pos = self.level.load_level(
+            self.create_spinning_coin, self.add_coin, self.create_debris,
+            self.add_powerup
+        )
+        self.player = Mariusz(screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state)
         self.hud = Hud(screen, self.world, 'red')
 
         # groups
-        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'),
-                             Koopa(224, 144))
+        self.enemies = self.level.enemies
         self.floating_points = Group()
-        self.coins_group = Group(Coin((83, 184), 'red'))
+        self.coins_group = self.level.coins
+        self.tiles_group = self.level.tiles
         self.powerups = Group()
         self.fireballs = Group()
 
@@ -99,7 +101,7 @@ class Controller:
             LEVEL_STATE: self.level_state,
             GAME_OVER_STATE: self.game_over_state
         }
-        self.current_state = LEVEL_STATE
+        self.current_state = MENU_STATE
         self.switch_time = time()  # TODO: change this later
 
         # TODO: this might be temporary
@@ -110,19 +112,21 @@ class Controller:
         # TEMPORARY!!!
 
         # the most important objects
-        self.level = Level(self.screen)
-        self.level.load_level(self.create_spinning_coin, self.add_coin,
-                              self.create_debris, self.add_powerup)
-        self.player = Mariusz(self.screen, (32, 64), 0, self.add_coin,
+        self.level = Level(self.screen, '1-1')
+        player_pos = self.level.load_level(
+            self.create_spinning_coin, self.add_coin, self.create_debris,
+            self.add_powerup
+        )
+        self.player = Mariusz(self.screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state)
         self.hud = Hud(self.screen, self.world, 'red')
 
         # groups
-        self.enemies = Group(Goomba(176, 144, 'red'), Goomba(200, 144, 'red'),
-                             Koopa(224, 144))
+        self.enemies = self.level.enemies
         self.floating_points = Group()
-        self.coins_group = Group(Coin((83, 184), 'red'))
+        self.coins_group = self.level.coins
+        self.tiles_group = self.level.tiles
         self.powerups = Group()
         self.fireballs = Group()
 
@@ -251,11 +255,11 @@ class Controller:
         # this section is skipped when player is dead or took power-up
         if self.player.is_alive and not self.player.is_upgrading:
             # update positions
-            self.powerups.update(dt, self.level.tiles)
-            self.fireballs.update(dt, self.level.tiles, self.enemies)
-            self.enemies.update(dt, self.level.tiles, self.enemies,
+            self.powerups.update(dt, self.tiles_group)
+            self.fireballs.update(dt, self.tiles_group, self.enemies)
+            self.enemies.update(dt, self.tiles_group, self.enemies,
                                 self.scroll)
-            self.player.update(dt, self.coins_group, self.level.tiles,
+            self.player.update(dt, self.coins_group, self.tiles_group,
                                self.enemies, self.powerups)
 
             # update HUD content - points, coins and time
@@ -292,7 +296,7 @@ class Controller:
         self.hud.draw()
         self.coins_group.update(self.screen)
         self.powerups.draw(self.screen)
-        self.level.tiles.update()
+        self.tiles_group.update()
         self.fireballs.draw(self.screen)
 
     def game_over_state(self, dt: float) -> None:
