@@ -107,8 +107,10 @@ class Goomba(Sprite):
                         
                 if self.speed.x > 0:  # touching left side of the other enemy
                     self.rect.right = enemy.rect.left
+                    self.pos.x = self.rect.x
                 else:  # touching right side of the other enemy
                     self.rect.left = enemy.rect.right
+                    self.pos.x = self.rect.x
                 self.speed *= -1
                 enemy.speed *= -1
 
