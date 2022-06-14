@@ -33,7 +33,7 @@ class Goomba(Sprite):
             ],
             'die': load_image(f'img/{theme}/goomba_die_0.png').convert_alpha()
         }
-        self.animation_speed = 0.3
+        self.animation_speed = 0.15
         self.last_time = time()
         self.image = self.images['walk'][0]
 
