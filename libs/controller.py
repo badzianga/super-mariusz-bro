@@ -1,4 +1,5 @@
 # TODO: self.size variable which holds player.size between levels
+# TODO: save and load high score. Display it in the menu
 
 from time import time
 
@@ -95,12 +96,14 @@ class Controller:
             LEVEL_STATE: self.level_state,
             GAME_OVER_STATE: self.game_over_state
         }
-        self.current_state = LOADING_STATE
+        self.current_state = MENU_STATE
         self.switch_time = time()  # TODO: change this later
 
-        self.screen = screen  # this might be TEMPORARY
+        # TODO: this might be temporary
+        self.screen = screen
+        self.menu_image = load_image('img/menu.png').convert()
 
-    def reset_game(self) -> None:
+    def reset_level(self) -> None:
         # TEMPORARY!!!
 
         # the most important objects
@@ -123,6 +126,13 @@ class Controller:
         self.dont_change_music = False
         self.paused = False  # if game is paused
         self.switch_time = time()  # TODO: change this later
+
+    def reset_game(self) -> None:
+        self.reset_level()
+        self.lifes = 3
+        self.coins = 0
+        self.points = 0
+        self.world = 1
 
     def add_powerup(self, position: tuple) -> None:
         """Generate proper power-up and add it to power-ups group."""
@@ -201,8 +211,14 @@ class Controller:
             music.unpause()
 
     def menu_state(self, dt: float) -> None:
-        """Update and draw all objects and groups related to menu."""
-        pass
+        """Update and draw all things related to menu."""
+
+        self.screen.blit(self.menu_image, (0, 0))
+
+        self.hud.update(self.coins, self.points)
+        self.hud.update_coin_indicator()
+
+        self.hud.draw()
 
     def loading_state(self, dt: float) -> None:
         """Update and draw all objects and groups related to loading screen."""
@@ -284,21 +300,31 @@ class Controller:
 
         self.hud.draw()
 
+        if time() - self.switch_time >= 7:
+            self.switch_state(MENU_STATE)
+
     def switch_state(self, state: int) -> None:
         """Swich current game state. Used in children objects, e.g. Player."""
-        self.current_state = state if self.lifes > 0 else GAME_OVER_STATE
+        if self.lifes > 0 or state == MENU_STATE:
+            self.current_state = state
+        else:
+            self.current_state = GAME_OVER_STATE
+    
         if self.current_state == LOADING_STATE:
             music.pause()
             self.hud.update_world(self.world)
             self.hud.half_reset()
             self.switch_time = time()
         elif self.current_state == LEVEL_STATE:
-            self.reset_game()  # TEMPORARY
+            self.reset_level()  # TEMPORARY
             music.load('music/smb_supermariobros.mp3')
             music.play(-1)
         elif self.current_state == GAME_OVER_STATE:
             music.load('music/smb_gameover.wav')
             music.play()
+            self.switch_time = time()
+        elif self.current_state == MENU_STATE:
+            self.reset_game()
 
     def run(self, dt: float) -> None:
         """Run current state."""

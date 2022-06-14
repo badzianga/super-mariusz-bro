@@ -5,7 +5,8 @@ import pygame
 from pygame import mixer
 from pygame.constants import K_ESCAPE, K_F11, K_F12, K_RETURN, KEYDOWN, QUIT
 
-from libs.constants import DISPLAY_SIZE, PHYSICS_FPS, SCREEN_SIZE
+from libs.constants import (DISPLAY_SIZE, LEVEL_STATE, LOADING_STATE,
+                            MENU_STATE, PHYSICS_FPS, SCREEN_SIZE)
 from libs.controller import Controller
 
 
@@ -40,7 +41,10 @@ def main() -> None:
                     pygame.quit()
                     exit()
                 elif event.key == K_RETURN:
-                    controller.pause()
+                    if controller.current_state == LEVEL_STATE:
+                        controller.pause()
+                    elif controller.current_state == MENU_STATE:
+                        controller.switch_state(LOADING_STATE)
                 elif event.key == K_F12:
                     lock_fps = not lock_fps
                 elif event.key == K_F11:
