@@ -40,3 +40,7 @@ class Points(Sprite):
         if time() - self.timer >= 1:
             self.kill()
             return
+
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

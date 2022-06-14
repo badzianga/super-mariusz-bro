@@ -23,6 +23,9 @@ class Tile(Sprite):
     def destroy(self) -> None:
         return
 
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
 class Brick(Tile):
     def __init__(self, image: Surface, position: tuple,
@@ -141,3 +144,7 @@ class QuestionBlock(Sprite):
     def destroy(self) -> None:
         # it can't be destroyed, but this function must exist
         self.bump()
+
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

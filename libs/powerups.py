@@ -59,6 +59,9 @@ class Mushroom(Sprite):
         self.move_vertically(dt)
         self.check_vertical_collisions(tiles)
 
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
 class FireFlower(Sprite):
     def __init__(self, images: tuple, position: tuple) -> None:
@@ -79,6 +82,10 @@ class FireFlower(Sprite):
                 self.frame = 0
             self.image = self.images[self.frame]
 
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
+
 
 class OneUP(Mushroom):
     def __init__(self, image: Surface, position: tuple) -> None:
@@ -91,3 +98,7 @@ class Star(Sprite):
 
         self.image = image
         self.rect = self.image.get_rect(topleft=position)
+
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

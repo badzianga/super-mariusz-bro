@@ -35,3 +35,7 @@ class Debris(Sprite):
 
         if self.pos.y > DISPLAY_SIZE[1]:
             self.kill()
+
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

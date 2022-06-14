@@ -185,7 +185,7 @@ class Mariusz(Sprite):
         else:
             self.image = self.states[self.size][self.state]
 
-    def move_horizontally(self, dt: float) -> None:
+    def move_horizontally(self, dt: float, scroll: int) -> None:
         keys = get_pressed()
 
         if keys[K_a]:
@@ -242,6 +242,11 @@ class Mariusz(Sprite):
 
         self.pos.x += self.speed.x * dt
         self.rect.x = self.pos.x
+
+        if self.rect.x < scroll:
+            self.speed.x = 0
+            self.pos.x = scroll
+            self.rect.x = scroll
 
     def move_vertically(self, dt: float) -> None:
         self.speed.y = min(self.speed.y + 1 * dt, 8)
@@ -436,21 +441,22 @@ class Mariusz(Sprite):
         self.remove_life()
         self.die_timer = time()
 
-    def draw(self) -> None:
+    def draw(self, scroll: int) -> None:
         if self.flip:
-            self.screen.blit(flip(self.image, True, False), self.rect)
+            self.screen.blit(flip(self.image, True, False),
+                             (self.rect.x - scroll, self.rect.y))
         else:
-            self.screen.blit(self.image, self.rect)
+            self.screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
     def update(self, dt: float, coins: Group, tiles: Group,
-               enemies: Group, mushrooms: Group) -> None:
+               enemies: Group, mushrooms: Group, scroll: int) -> None:
         self.remove_invincibility()
 
         if self.can_shoot:
             self.shoot()
             self.can_shoot = False
 
-        self.move_horizontally(dt)
+        self.move_horizontally(dt, scroll)
         self.check_horizontal_collisions(tiles)
 
         self.move_vertically(dt)

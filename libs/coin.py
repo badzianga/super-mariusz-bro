@@ -27,7 +27,7 @@ class Coin(Sprite):
         # position
         self.rect = self.image.get_rect(topleft=position)
 
-    def update(self, screen: Surface) -> None:
+    def update(self, screen: Surface, scroll: int) -> None:
         """Update animation and image, draw coin onto screen."""
         if time() - self.last_time >= self.animation[self.frame][1]:
             self.last_time = time()
@@ -36,11 +36,11 @@ class Coin(Sprite):
                 self.frame = 0
             self.image = self.images[self.animation[self.frame][0]]
 
-        self.draw(screen)
+        self.draw(screen, scroll)
 
-    def draw(self, screen: Surface) -> None:
-        """Draw coin onto screen."""
-        screen.blit(self.image, self.rect)
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
 
 class SpinningCoin(Sprite):
@@ -90,3 +90,7 @@ class SpinningCoin(Sprite):
         # update position
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
+
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

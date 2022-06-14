@@ -120,8 +120,9 @@ class Goomba(Sprite):
         self.image = self.images['die']
         self.is_alive = False
 
-    def draw(self, screen: Surface) -> None:
-        screen.blit(self.image, self.rect)
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
     def update(self, dt: float, tiles: Group, enemies: Group,
                scroll: int) -> None:
@@ -197,13 +198,14 @@ class Koopa(Goomba):
         self.speed.x = self.speed.x // 6
         self.last_time = time()
 
-    def draw(self, screen: Surface) -> None:
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
         if self.state == 'walk':
             screen.blit(flip_image(self.image, self.flip, False),
-                        (self.rect.x, self.rect.y - 8))
+                        (self.rect.x - scroll, self.rect.y - 8))
         else:
             screen.blit(flip_image(self.image, self.flip, False),
-                        (self.rect.x, self.rect.y))
+                        (self.rect.x - scroll, self.rect.y))
 
     def update(self, dt: float, tiles: Group, enemies: Group,
                scroll: int) -> None:

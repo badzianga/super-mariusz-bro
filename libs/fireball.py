@@ -102,3 +102,7 @@ class Fireball(Sprite):
         self.check_horizontal_collisions(tiles)
 
         self.check_enemy_collisions(enemies)
+
+    def draw(self, screen: Surface, scroll: int):
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

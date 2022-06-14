@@ -95,6 +95,7 @@ class Level:
                         )
         return player_pos
 
-    def draw(self) -> None:
+    def draw(self, scroll: int) -> None:
         """Draw all tiles onto screen."""
-        self.tiles.draw(self.screen)
+        for tile in self.tiles:
+            tile.draw(self.screen, scroll)

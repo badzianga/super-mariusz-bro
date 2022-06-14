@@ -246,7 +246,7 @@ class Controller:
             return
 
         self.screen.fill(BG_COLOR)  # clear whole screen Surface
-        self.level.draw()  # draw all tiles
+        self.level.draw(self.scroll)  # draw all tiles
         
         # update floating points, spinning coins and debris
         self.floating_points.update(dt)
@@ -259,7 +259,7 @@ class Controller:
             self.enemies.update(dt, self.tiles_group, self.enemies,
                                 self.scroll)
             self.player.update(dt, self.coins_group, self.tiles_group,
-                               self.enemies, self.powerups)
+                               self.enemies, self.powerups, self.scroll)
 
             # update HUD content - points, coins and time
             self.hud.update(self.coins, self.points)
@@ -289,14 +289,21 @@ class Controller:
 
         # draw objects onto screen Surface
         for enemy in self.enemies:
-            enemy.draw(self.screen)
-        self.floating_points.draw(self.screen)
-        self.player.draw()
+            enemy.draw(self.screen, self.scroll)
+        for points in self.floating_points:
+            points.draw(self.screen, self.scroll)
+        self.player.draw(self.scroll)
         self.hud.draw()
-        self.coins_group.update(self.screen)
-        self.powerups.draw(self.screen)
+        self.coins_group.update(self.screen, self.scroll)
+        for powerup in self.powerups:
+            powerup.draw(self.screen, self.scroll)
         self.tiles_group.update()
-        self.fireballs.draw(self.screen)
+        for fireball in self.fireballs:
+            fireball.draw(self.screen, self.scroll)
+
+        # update scroll
+        if self.player.rect.x - 128 >= self.scroll:
+            self.scroll = self.player.rect.x - 128
 
     def game_over_state(self, dt: float) -> None:
         """Update and draw all things related to game over screen."""
