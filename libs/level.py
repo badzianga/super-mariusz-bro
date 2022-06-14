@@ -7,7 +7,7 @@ from pygame.surface import Surface
 
 from .coin import Coin
 from .enemies import Goomba, Koopa
-from .tiles import Brick, QuestionBlock, Tile
+from .tiles import Brick, Decoration, QuestionBlock, Tile
 
 
 class Level:
@@ -19,6 +19,7 @@ class Level:
         self.tiles = Group()
         self.coins = Group()
         self.enemies = Group()
+        self.decorations = Group()
 
         # temporary, these will be in Controller in the future
         self.rock_img = load_image('img/rock_0.png').convert()
@@ -26,6 +27,14 @@ class Level:
         self.brick_img_0 = load_image('img/brick_0.png').convert()
         self.brick_img_1 = load_image('img/brick_1.png').convert()
         self.plate_img = load_image('img/plate_0.png').convert()
+        self.hill_img_0 = load_image('img/hill_0.png').convert_alpha()
+        self.hill_img_1 = load_image('img/hill_1.png').convert_alpha()
+        self.bush_img_0 = load_image('img/bush_0.png').convert_alpha()
+        self.bush_img_1 = load_image('img/bush_1.png').convert_alpha()
+        self.bush_img_2 = load_image('img/bush_2.png').convert_alpha()
+        self.cloud_img_0 = load_image('img/cloud_0.png').convert_alpha()
+        self.cloud_img_1 = load_image('img/cloud_1.png').convert_alpha()
+        self.cloud_img_2 = load_image('img/cloud_2.png').convert_alpha()
 
         # TODO: temporary?
         self.world = world
@@ -93,9 +102,44 @@ class Level:
                         self.enemies.add(
                             Koopa(x * 16, y * 16 + 8)
                         )
+                    case 30:  # hill (small)
+                        self.decorations.add(
+                            Decoration((x * 16, y * 16 + 21), self.hill_img_0)
+                        )
+                    case 31:  # hill (large)
+                        self.decorations.add(
+                            Decoration((x * 16, y * 16 + 21), self.hill_img_1)
+                        )
+                    case 32:  # bush (small)
+                        self.decorations.add(
+                            Decoration((x * 16 - 8, y * 16 + 8), self.bush_img_0)
+                        )
+                    case 33:  # bush (medium)
+                        self.decorations.add(
+                            Decoration((x * 16 - 8, y * 16 + 8), self.bush_img_1)
+                        )
+                    case 34:  # bush (large)
+                        self.decorations.add(
+                            Decoration((x * 16 - 8, y * 16 + 8), self.bush_img_2)
+                        )
+                    case 35:  # cloud (small)
+                        self.decorations.add(
+                            Decoration((x * 16 + 8, y * 16 + 8), self.cloud_img_0)
+                        )
+                    case 36:  # cloud (medium)
+                        self.decorations.add(
+                            Decoration((x * 16 + 8, y * 16 + 8), self.cloud_img_1)
+                        )
+                    case 37:  # cloud (large)
+                        self.decorations.add(
+                            Decoration((x * 16 + 8, y * 16 + 8), self.cloud_img_2)
+                        )
         return player_pos
 
     def draw(self, scroll: int) -> None:
         """Draw all tiles onto screen."""
+        for decoration in self.decorations:
+            decoration.draw(self.screen, scroll)
+
         for tile in self.tiles:
             tile.draw(self.screen, scroll)

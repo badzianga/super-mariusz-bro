@@ -148,3 +148,14 @@ class QuestionBlock(Sprite):
     def draw(self, screen: Surface, scroll: int):
         """Draw sprite onto screen."""
         screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
+
+
+class Decoration(Sprite):
+    def __init__(self, position: tuple, image: Surface) -> None:
+        super().__init__()
+
+        self.image = image
+        self.rect = self.image.get_rect(topleft=position)
+
+    def draw(self, screen: Surface, scroll: int) -> None:
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
