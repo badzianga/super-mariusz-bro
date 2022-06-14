@@ -461,7 +461,6 @@ class Mariusz(Sprite):
 
         self.move_horizontally(dt, scroll)
         self.check_horizontal_collisions(tiles)
-        print(self.speed.x)
 
         self.move_vertically(dt)
         self.check_vertical_collisions(tiles)
