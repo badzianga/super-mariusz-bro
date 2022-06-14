@@ -1,6 +1,3 @@
-# TODO: problem with animation when walking into walls
-# TODO: running animation when jumping (extremum)
-# TODO: disable constantly jumping when holding jump key
 # TODO: player can't kill enemies when invincible
 
 from time import time
@@ -107,6 +104,7 @@ class Mariusz(Sprite):
         # sure about order
         self.can_shoot = False
         self.can_jump = False
+        self.jumped = False
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -252,7 +250,6 @@ class Mariusz(Sprite):
         self.speed.y = min(self.speed.y + 1 * dt, 8)
 
         if not self.in_air:
-            keys = get_pressed()
             if self.can_jump:  # jump
                 if self.size == 0:
                     self.jump_sound.play()
@@ -261,6 +258,7 @@ class Mariusz(Sprite):
                 self.speed.y = -8
                 self.in_air = True
                 self.can_jump = False
+                self.jumped = True
 
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
@@ -273,6 +271,7 @@ class Mariusz(Sprite):
                     self.rect.left = tile.rect.right
                     self.pos.x = self.rect.x
                     self.speed.x = 0
+                    self.change_state('idle')
                     return  # finish looking for collisions
                 # touching left wall
                 elif self.speed.x > 0:
@@ -290,6 +289,7 @@ class Mariusz(Sprite):
                     self.pos.y = self.rect.y
                     self.speed.y = 0
                     self.in_air = False
+                    self.jumped = False
                 elif self.speed.y < 0:
                     self.rect.top = tile.rect.bottom
                     self.pos.y = self.rect.y
@@ -303,6 +303,9 @@ class Mariusz(Sprite):
         if abs(self.speed.y) > 1.5:
             self.in_air = True
             self.change_state('jump')
+        else:
+            if self.jumped:
+                self.change_state('jump')
 
     def check_coin_collision(self, coins: Group) -> None:
         coin_collisions = spritecollide(self, coins, False)
@@ -458,6 +461,7 @@ class Mariusz(Sprite):
 
         self.move_horizontally(dt, scroll)
         self.check_horizontal_collisions(tiles)
+        print(self.speed.x)
 
         self.move_vertically(dt)
         self.check_vertical_collisions(tiles)
