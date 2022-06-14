@@ -41,6 +41,9 @@ class Controller:
         self.points = 0
         self.world = 1
 
+        # level variable
+        self.scroll = 0
+
         # most of the images will be loaded here in the future
         self.images = {
             'mushroom': load_image('img/mushroom.png'),
@@ -126,6 +129,7 @@ class Controller:
         self.dont_change_music = False
         self.paused = False  # if game is paused
         self.switch_time = time()  # TODO: change this later
+        self.scroll = 0  # TODO: apply checkpoint scroll if needed
 
     def reset_game(self) -> None:
         self.reset_level()
@@ -249,7 +253,8 @@ class Controller:
             # update positions
             self.powerups.update(dt, self.level.tiles)
             self.fireballs.update(dt, self.level.tiles, self.enemies)
-            self.enemies.update(dt, self.level.tiles, self.enemies)
+            self.enemies.update(dt, self.level.tiles, self.enemies,
+                                self.scroll)
             self.player.update(dt, self.coins_group, self.level.tiles,
                                self.enemies, self.powerups)
 

@@ -123,8 +123,14 @@ class Goomba(Sprite):
     def draw(self, screen: Surface) -> None:
         screen.blit(self.image, self.rect)
 
-    def update(self, dt: float, tiles: Group, enemies: Group) -> None:
+    def update(self, dt: float, tiles: Group, enemies: Group,
+               scroll: int) -> None:
         """Update enemy image and position, disappear it after squished."""
+        if self.rect.x - scroll > 304:
+            return  # don't update when too far from left screen border
+        if self.rect.y > 224 or self.rect.x - scroll < -48:
+            self.kill()  # remove enemy when fallen down or too far to the left
+
         if self.is_alive:  # alive state - update walking image
             if time() - self.last_time >= self.animation_speed:
                 self.last_time = time()
@@ -199,8 +205,14 @@ class Koopa(Goomba):
             screen.blit(flip_image(self.image, self.flip, False),
                         (self.rect.x, self.rect.y))
 
-    def update(self, dt: float, tiles: Group, enemies: Group) -> None:
+    def update(self, dt: float, tiles: Group, enemies: Group,
+               scroll: int) -> None:
         """Update enemy image and position."""
+        if self.rect.x - scroll > 304:
+            return  # don't update when too far from left screen border
+        if self.rect.y > 224 or self.rect.x - scroll < -48:
+            self.kill()  # remove enemy when fallen down or too far to the left
+
         if self.state == 'walk':  # alive state - update walking image
             if time() - self.last_time >= self.animation_speed:
                 self.last_time = time()
