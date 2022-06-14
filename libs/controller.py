@@ -10,12 +10,11 @@ from pygame.mixer import Sound, music
 from pygame.sprite import Group
 from pygame.time import Clock
 
-from .coin import Coin, SpinningCoin
+from .coin import SpinningCoin
 from .constants import (BG_COLOR, BLACK, GAME_OVER_STATE, LEVEL_STATE,
                         LOADING_STATE, MENU_STATE)
 from .debris import Debris
 from .debug import Debug
-from .enemies import Goomba, Koopa
 from .fireball import Fireball
 from .hud import Hud
 from .level import Level

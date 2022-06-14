@@ -6,7 +6,7 @@
 from time import time
 from types import FunctionType
 
-from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_a, K_z
+from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_a
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.math import Vector2
