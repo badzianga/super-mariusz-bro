@@ -74,7 +74,7 @@ class FireFlower(Sprite):
         self.animation_speed = 0.05
         self.last_time = time()
 
-    def update(self, dt: float, tiles: Group) -> None:
+    def update(self, _, __) -> None:
         if time() - self.last_time >= self.animation_speed:
             self.last_time = time()
             self.frame += 1

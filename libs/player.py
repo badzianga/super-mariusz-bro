@@ -263,6 +263,9 @@ class Mariusz(Sprite):
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
 
+        if self.is_alive and self.rect.y > 224:
+            self.kill()
+
     def check_horizontal_collisions(self, tiles: Group) -> None:
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
@@ -423,7 +426,7 @@ class Mariusz(Sprite):
                 self.is_upgrading = False
 
     def die_animation(self, dt: float) -> None:
-        if time() - self.die_timer >= 0.4: 
+        if time() - self.die_timer >= 0.4 and self.rect.y <= 224: 
             self.move_vertically(dt)
 
         if time() - self.die_timer >= 3.4:  # TODO: maybe change this time

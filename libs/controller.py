@@ -217,7 +217,7 @@ class Controller:
         else:
             music.unpause()
 
-    def menu_state(self, dt: float) -> None:
+    def menu_state(self, _) -> None:
         """Update and draw all things related to menu."""
 
         self.screen.blit(self.menu_image, (0, 0))
@@ -227,7 +227,7 @@ class Controller:
 
         self.hud.draw()
 
-    def loading_state(self, dt: float) -> None:
+    def loading_state(self, _) -> None:
         """Update and draw all objects and groups related to loading screen."""
         if time() - self.switch_time >= 3:
             self.switch_state(LEVEL_STATE)
@@ -305,7 +305,7 @@ class Controller:
         if self.player.rect.x - 128 >= self.scroll:
             self.scroll = self.player.rect.x - 128
 
-    def game_over_state(self, dt: float) -> None:
+    def game_over_state(self, _) -> None:
         """Update and draw all things related to game over screen."""
 
         self.screen.fill(BLACK)
