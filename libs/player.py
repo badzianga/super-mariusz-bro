@@ -151,6 +151,8 @@ class Mariusz(Sprite):
         elif self.size == 1:
             self.size += 1
             self.upgrade_index = 0
+        else:
+            return
 
         self.is_upgrading = True
 
