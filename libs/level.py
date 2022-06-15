@@ -106,11 +106,11 @@ class Level:
                         )
                     case 16:  # pipe (crossing middle)
                         self.tiles.add(
-                            Tile(self.pipe_img_1, (x * 16, y * 16 + 8))
+                            Tile(self.pipe_img_2, (x * 16 - 4, y * 16 + 8))
                         )
                     case 17:  # pipe (left)
                         self.tiles.add(
-                            Tile(self.pipe_img_1, (x * 16, y * 16 + 8))
+                            Tile(self.pipe_img_3, (x * 16, y * 16 + 8))
                         )
                     case 20:  # player
                         player_pos = (x * 16 - 8, y * 16 + 8)

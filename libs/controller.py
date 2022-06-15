@@ -46,6 +46,29 @@ class Controller:
         # level variable
         self.scroll = 0
 
+        # spaghetti
+        self.worlds = {
+            1: '1-1',
+            1.5: '1-1_extra'
+        }
+        self.themes = {
+            1: 'red',
+            1.5: 'blue'
+        }
+        self.bg_colors = {
+            1: BG_COLOR,
+            1.5: BLACK
+        }
+        self.theme = self.themes[self.world]
+        self.music = {
+            1: 'music/smb_supermariobros.mp3',
+            1.5: 'music/smb_underground.mp3',
+        }
+        self.music_hurry = {
+            1: 'music/smb_supermariobroshurry.mp3',
+            1.5: 'music/smb_undergroundhurry.mp3',
+        }
+
         # most of the images will be loaded here in the future
         self.images = {
             'mushroom': load_image('img/mushroom.png'),
@@ -62,7 +85,7 @@ class Controller:
         }
 
         # the most important objects
-        self.level = Level(screen, '1-1', 'red')
+        self.level = Level(screen, self.worlds[self.world], self.theme)
         player_pos = self.level.load_level(
             self.create_spinning_coin, self.add_coin, self.create_debris,
             self.add_powerup
@@ -70,7 +93,7 @@ class Controller:
         self.player = Mariusz(screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state)
-        self.hud = Hud(screen, self.world, 'red', self.font)
+        self.hud = Hud(screen, int(self.world), self.theme, self.font)
 
         # groups
         self.enemies = self.level.enemies
@@ -123,7 +146,7 @@ class Controller:
         # TEMPORARY!!!
 
         # the most important objects
-        self.level = Level(self.screen, '1-1', 'red')
+        self.level = Level(self.screen, self.worlds[self.world], self.theme)
         player_pos = self.level.load_level(
             self.create_spinning_coin, self.add_coin, self.create_debris,
             self.add_powerup
@@ -131,7 +154,7 @@ class Controller:
         self.player = Mariusz(self.screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state)
-        self.hud = Hud(self.screen, self.world, 'red', self.font)
+        self.hud = Hud(self.screen, int(self.world), self.theme, self.font)
 
         # groups
         self.enemies = self.level.enemies
@@ -259,7 +282,7 @@ class Controller:
         if self.paused:  # don't update game if paused
             return
 
-        self.screen.fill(BG_COLOR)  # clear whole screen Surface
+        self.screen.fill(self.bg_colors[self.world])  # clear screen Surface
         self.level.draw(self.scroll)  # draw all tiles
         
         # update floating points, spinning coins and debris
@@ -282,7 +305,7 @@ class Controller:
             # play hurry music
             if self.hud.timer == 100:
                 if not self.dont_change_music:
-                    music.load('music/smb_supermariobroshurry.mp3')
+                    music.load(self.music_hurry[self.world])
                     music.play()
                 self.dont_change_music = True
 
@@ -316,6 +339,8 @@ class Controller:
             fireball.draw(self.screen, self.scroll)
 
         # update scroll
+        if isinstance(self.world, float):
+            return  # I don't want to update scroll when on extra map
         if self.player.rect.x - 128 >= self.scroll:
             self.scroll = self.player.rect.x - 128
 
@@ -341,12 +366,12 @@ class Controller:
     
         if self.current_state == LOADING_STATE:
             music.pause()
-            self.hud.update_world(self.world)
+            self.hud.update_world(int(self.world))
             self.hud.half_reset()
             self.switch_time = time()
         elif self.current_state == LEVEL_STATE:
             self.reset_level()  # TEMPORARY
-            music.load('music/smb_supermariobros.mp3')
+            music.load(self.music[self.world])
             music.play(-1)
         elif self.current_state == GAME_OVER_STATE:
             music.load('music/smb_gameover.wav')
