@@ -1,3 +1,5 @@
+# TODO: kill fireballs when too far from player
+
 from time import time
 from types import FunctionType
 

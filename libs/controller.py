@@ -1,9 +1,11 @@
 # TODO: self.size variable which holds player.size between levels
 # TODO: save and load high score. Display it in the menu
 
+from pickle import dump, load
 from time import time
 
 from pygame import Surface
+from pygame.font import Font
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.mixer import Sound, music
@@ -12,7 +14,7 @@ from pygame.time import Clock
 
 from .coin import SpinningCoin
 from .constants import (BG_COLOR, BLACK, GAME_OVER_STATE, LEVEL_STATE,
-                        LOADING_STATE, MENU_STATE)
+                        LOADING_STATE, MENU_STATE, WHITE)
 from .debris import Debris
 from .debug import Debug
 from .fireball import Fireball
@@ -33,6 +35,7 @@ class Controller:
     def __init__(self, screen: Surface, clock: Clock) -> None:
         "Initialize Controller - 'brain' of the game."
         self.screen = screen
+        self.font = Font('fonts/PressStart2P.ttf', 8)
 
         # player variables
         self.lifes = 3
@@ -67,7 +70,7 @@ class Controller:
         self.player = Mariusz(screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state)
-        self.hud = Hud(screen, self.world, 'red')
+        self.hud = Hud(screen, self.world, 'red', self.font)
 
         # groups
         self.enemies = self.level.enemies
@@ -107,6 +110,15 @@ class Controller:
         self.screen = screen
         self.menu_image = load_image('img/menu.png').convert()
 
+        # load highscore
+        try:
+            with open('highscore', 'rb') as f:
+                self.highscore = load(f)
+        except FileNotFoundError:
+            self.highscore = 0
+            with open('highscore', 'wb') as f:
+                dump(self.highscore, f)
+
     def reset_level(self) -> None:
         # TEMPORARY!!!
 
@@ -119,7 +131,7 @@ class Controller:
         self.player = Mariusz(self.screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state)
-        self.hud = Hud(self.screen, self.world, 'red')
+        self.hud = Hud(self.screen, self.world, 'red', self.font)
 
         # groups
         self.enemies = self.level.enemies
@@ -221,6 +233,8 @@ class Controller:
         """Update and draw all things related to menu."""
 
         self.screen.blit(self.menu_image, (0, 0))
+        surf = self.font.render(str(self.highscore).zfill(6), False, WHITE)
+        self.screen.blit(surf, (136, 176))
 
         self.hud.update(self.coins, self.points)
         self.hud.update_coin_indicator()
@@ -338,6 +352,10 @@ class Controller:
             music.load('music/smb_gameover.wav')
             music.play()
             self.switch_time = time()
+            # save score
+            if self.points > self.highscore:
+                with open('highscore', 'wb') as f:
+                    dump(self.points, f)
         elif self.current_state == MENU_STATE:
             self.reset_game()
 

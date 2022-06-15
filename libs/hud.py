@@ -16,11 +16,12 @@ class Hud:
     after collecting 100 coins. It only shows information.
     """
 
-    def __init__(self, screen: Surface, world: int, theme: str) -> None:
+    def __init__(self, screen: Surface, world: int, theme: str,
+                 font: Font) -> None:
         """Initialize HUD."""
         self.screen = screen
         self.last_time = time()
-        self.font = Font('fonts/PressStart2P.ttf', 8)
+        self.font = font
 
         self.timer = 400
 
