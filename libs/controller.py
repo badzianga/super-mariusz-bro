@@ -381,6 +381,7 @@ class Controller:
             if self.points > self.highscore:
                 with open('highscore', 'wb') as f:
                     dump(self.points, f)
+                    self.highscore = self.points
         elif self.current_state == MENU_STATE:
             self.reset_game()
 
