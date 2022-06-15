@@ -39,7 +39,7 @@ def main() -> None:
                 exit()
             elif event.type == KEYDOWN:
                 if event.key == K_z:
-                    controller.player.can_jump = True
+                    controller.player.jump()
                 elif event.key == K_a:
                     controller.player.can_shoot = True
                 elif event.key == K_ESCAPE:
@@ -57,6 +57,7 @@ def main() -> None:
             elif event.type == KEYUP:
                 if event.key == K_z:
                     controller.player.can_jump = False
+                    controller.player.hold_jump = False
                 elif event.key == K_a:
                     controller.player.can_shoot = False
 

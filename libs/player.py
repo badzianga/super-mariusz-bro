@@ -1,4 +1,5 @@
 # TODO: player can't kill enemies when invincible
+# TODO: fix collisions with bumped tiles
 
 from time import time
 from types import FunctionType
@@ -99,12 +100,13 @@ class Mariusz(Sprite):
         self.last_shoot_time = 0
 
         # variables changed by main event handler
-        # I was too tired to think about something separated from this handler
-        # I don't want to call methods directly from handler because I'm not
-        # sure about order
         self.can_shoot = False
         self.can_jump = False
+        self.hold_jump = False
+        self.hold_jump_timer = 0
+
         self.jumped = False
+        
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -132,6 +134,12 @@ class Mariusz(Sprite):
             self.create_fireball(self.rect.midleft, -1)
         else:
             self.create_fireball(self.rect.midright, 1)
+
+    def jump(self) -> None:
+        if not self.in_air:
+            self.can_jump = True
+            self.hold_jump = True
+            self.hold_jump_timer = time()
 
     def upgrade(self) -> None:
         self.powerup_sound.play()
@@ -247,18 +255,22 @@ class Mariusz(Sprite):
             self.rect.x = scroll
 
     def move_vertically(self, dt: float) -> None:
+        # apply gravity
         self.speed.y = min(self.speed.y + 1 * dt, 8)
 
-        if not self.in_air:
-            if self.can_jump:  # jump
-                if self.size == 0:
-                    self.jump_sound.play()
-                else:
-                    self.large_jump_sound.play()
-                self.speed.y = -8
-                self.in_air = True
-                self.can_jump = False
-                self.jumped = True
+        if self.can_jump:  # jump
+            if self.size == 0:
+                self.jump_sound.play()
+            else:
+                self.large_jump_sound.play()
+            self.speed.y = -6
+            self.in_air = True
+            self.can_jump = False
+            self.jumped = True
+
+        if self.hold_jump and self.speed.y < 0:
+            if time() - self.hold_jump_timer <= 0.30:
+                self.speed.y = -6
 
         self.pos.y += self.speed.y * dt
         self.rect.y = self.pos.y
