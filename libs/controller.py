@@ -62,7 +62,7 @@ class Controller:
         }
 
         # the most important objects
-        self.level = Level(screen, '1-1')
+        self.level = Level(screen, '1-1', 'red')
         player_pos = self.level.load_level(
             self.create_spinning_coin, self.add_coin, self.create_debris,
             self.add_powerup
@@ -123,7 +123,7 @@ class Controller:
         # TEMPORARY!!!
 
         # the most important objects
-        self.level = Level(self.screen, '1-1')
+        self.level = Level(self.screen, '1-1', 'red')
         player_pos = self.level.load_level(
             self.create_spinning_coin, self.add_coin, self.create_debris,
             self.add_powerup

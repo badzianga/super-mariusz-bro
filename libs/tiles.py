@@ -69,7 +69,7 @@ class Brick(Tile):
 
 class QuestionBlock(Sprite):
     def __init__(self, position: tuple, create_spinning_coin: FunctionType,
-                 add_coin: FunctionType, add_powerup: FunctionType,
+                 add_coin: FunctionType, add_powerup: FunctionType, theme: str,
                  powerup: bool=False) -> None:
         super().__init__()
 
@@ -77,7 +77,7 @@ class QuestionBlock(Sprite):
             load_image(f'img/question_block_{i}.png').convert_alpha()
             for i in range(3)
         ]
-        self.images.append(load_image('img/plate_0.png').convert_alpha())
+        self.images.append(load_image(f'img/{theme}/plate_0.png').convert_alpha())
         self.frame = 0
         self.animation = ((0, 0.45), (1, 0.15), (2, 0.15), (1, 0.15))
         self.last_time = time()

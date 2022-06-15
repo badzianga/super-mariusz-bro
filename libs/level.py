@@ -13,7 +13,7 @@ from .tiles import Brick, Decoration, QuestionBlock, Tile
 class Level:
     """Object with map data that contains all tiles."""
 
-    def __init__(self, screen: Surface, world: str) -> None:
+    def __init__(self, screen: Surface, world: str, theme: str) -> None:
         self.screen = screen
 
         self.tiles = Group()
@@ -22,11 +22,11 @@ class Level:
         self.decorations = Group()
 
         # temporary, these will be in Controller in the future
-        self.rock_img = load_image('img/rock_0.png').convert()
-        self.block_img = load_image('img/block_0.png').convert()
-        self.brick_img_0 = load_image('img/brick_0.png').convert()
-        self.brick_img_1 = load_image('img/brick_1.png').convert()
-        self.plate_img = load_image('img/plate_0.png').convert()
+        self.rock_img = load_image(f'img/{theme}/rock_0.png').convert()
+        self.block_img = load_image(f'img/{theme}/block_0.png').convert()
+        self.brick_img_0 = load_image(f'img/{theme}/brick_0.png').convert()
+        self.brick_img_1 = load_image(f'img/{theme}/brick_1.png').convert()
+        self.plate_img = load_image(f'img/{theme}/plate_0.png').convert()
         self.hill_img_0 = load_image('img/hill_0.png').convert_alpha()
         self.hill_img_1 = load_image('img/hill_1.png').convert_alpha()
         self.bush_img_0 = load_image('img/bush_0.png').convert_alpha()
@@ -37,6 +37,8 @@ class Level:
         self.cloud_img_2 = load_image('img/cloud_2.png').convert_alpha()
         self.pipe_img_0 = load_image('img/pipe_0.png').convert_alpha()
         self.pipe_img_1 = load_image('img/pipe_1.png').convert_alpha()
+        self.pipe_img_2 = load_image('img/pipe_2.png').convert_alpha()
+        self.pipe_img_3 = load_image('img/pipe_3.png').convert_alpha()
 
         # TODO: temporary?
         self.world = world
@@ -79,12 +81,12 @@ class Level:
                     case 10:  # question block (coin)
                         self.tiles.add(
                             QuestionBlock((x * 16, y * 16 + 8), create_spinning_coin,
-                                        add_coin, add_powerup)
+                                        add_coin, add_powerup, 'red')
                         )
                     case 11:  # question block (power-up)
                         self.tiles.add(
                             QuestionBlock((x * 16, y * 16 + 8), create_spinning_coin,
-                                        add_coin, add_powerup, True)
+                                        add_coin, add_powerup, 'red', True)
                         )
                     case 12:  # coin
                         self.coins.add(
@@ -99,6 +101,14 @@ class Level:
                             Tile(self.pipe_img_0, (x * 16, y * 16 + 8))
                         )
                     case 15:  # pipe (middle)
+                        self.tiles.add(
+                            Tile(self.pipe_img_1, (x * 16, y * 16 + 8))
+                        )
+                    case 16:  # pipe (crossing middle)
+                        self.tiles.add(
+                            Tile(self.pipe_img_1, (x * 16, y * 16 + 8))
+                        )
+                    case 17:  # pipe (left)
                         self.tiles.add(
                             Tile(self.pipe_img_1, (x * 16, y * 16 + 8))
                         )
