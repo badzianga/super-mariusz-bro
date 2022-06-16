@@ -7,7 +7,7 @@ from pygame.surface import Surface
 
 from .coin import Coin
 from .enemies import Goomba, Koopa
-from .tiles import Brick, Decoration, QuestionBlock, Tile
+from .tiles import Brick, CoinBrick, Decoration, QuestionBlock, Tile
 
 
 class Level:
@@ -77,6 +77,12 @@ class Level:
                     case 5:  # plate
                         self.tiles.add(
                             Tile(self.plate_img, (x * 16, y * 16 + 8))
+                        )
+                    case 6:  # brick (with coins)
+                        self.tiles.add(
+                            CoinBrick(self.brick_img_0, (x * 16, y * 16 + 8),
+                                      self.plate_img, create_spinning_coin,
+                                      add_coin)
                         )
                     case 10:  # question block (coin)
                         self.tiles.add(

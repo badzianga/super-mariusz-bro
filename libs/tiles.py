@@ -70,6 +70,38 @@ class Brick(Tile):
         self.kill()
 
 
+class CoinBrick(Brick):
+    def __init__(self, image: Surface, position: tuple, plate_image: Surface,
+                 create_spinning_coin: FunctionType, add_coin) -> None:
+        super().__init__(image, position, None)
+
+        self.coins = 6
+        self.add_coin = create_spinning_coin
+        self.cant_bump = False
+        self.plate_image = plate_image
+
+        self.create_spinning_coin = create_spinning_coin
+        self.add_coin = add_coin
+
+    def bump(self) -> None:
+        if self.bumped or self.cant_bump:
+            return
+        self.bump_sound.play()
+        self.frame = 0
+        self.bumped = True
+        # just to make sure it gets updated immediately I'm subtracting 1
+        self.last_time = time() - 1
+        self.coins -= 1
+        self.create_spinning_coin((self.rect.x + 4, self.rect.y - 16))
+        self.add_coin()
+        if self.coins == 0:
+            self.image = self.plate_image
+            self.cant_bump = True
+
+    def destroy(self) -> None:
+        self.bump()
+
+
 class QuestionBlock(Sprite):
     def __init__(self, position: tuple, create_spinning_coin: FunctionType,
                  add_coin: FunctionType, add_powerup: FunctionType, theme: str,
