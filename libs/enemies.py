@@ -64,28 +64,33 @@ class Goomba(Sprite):
         """Check horizontal collisions with map tiles and adjust position."""
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
+                if tile.bumped:
+                    self.kill()
+                    return
                 if self.speed.x < 0:  # touching right wall
                     self.rect.left = tile.rect.right
                     self.pos.x = self.rect.x
                     self.speed.x *= -1
-                    return  # finish looking for collisions
+                    return
 
                 elif self.speed.x > 0:  # touching left wall
                     self.rect.right = tile.rect.left
                     self.pos.x = self.rect.x
                     self.speed.x *= -1
-                    return  # finish looking for collisions
+                    return
 
     def check_vertical_collisions(self, tiles: Group) -> None:
         """Check vertical collisions with map tiles and adjust position."""
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
+                if tile.bumped:
+                    self.kill()
+                    return
                 if self.speed.y > 0:  # touching floor
-                    # TODO: kill enemy if tile.bumped
                     self.rect.bottom = tile.rect.top
                     self.pos.y = self.rect.y
                     self.speed.y = 0
-                return  # finish looking for collisions
+                    return
 
     def check_enemy_collisions(self, enemies: Group) -> None:
         """Check collisions with other enemies."""

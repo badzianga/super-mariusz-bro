@@ -14,6 +14,8 @@ class Tile(Sprite):
         self.image = image
         self.rect = self.image.get_rect(topleft=position)
 
+        self.bumped = False
+
     def update(self) -> None:
         return
 
@@ -62,6 +64,7 @@ class Brick(Tile):
         self.last_time = time() - 1
 
     def destroy(self) -> None:
+        self.bumped = True
         self.break_sound.play()
         self.create_debris(self.rect.center)
         self.kill()
@@ -88,9 +91,9 @@ class QuestionBlock(Sprite):
         self.bump_sound = Sound('sfx/smb_bump.wav')
         self.powerup_sound = Sound('sfx/smb_powerup_appears.wav')
 
-        self.bumped = False
+        self.updated = False
         self.powerup = powerup
-        self.just_bumped = False
+        self.bumped = False
         self.created_coin = False
         self.played_powerup_sound = False
 
@@ -99,9 +102,9 @@ class QuestionBlock(Sprite):
         self.add_powerup = add_powerup
 
     def update(self) -> None:
-        if self.bumped:
+        if self.updated:
             return
-        if self.just_bumped:
+        if self.bumped:
             if self.powerup:
                 if not self.played_powerup_sound:
                     self.powerup_sound.play()
@@ -117,7 +120,7 @@ class QuestionBlock(Sprite):
                 elif self.frame < 10: 
                     self.rect.y += 1
                 else:
-                    self.bumped = True
+                    self.updated = True
                     if self.powerup:
                         # TODO: juhuuu
                         self.add_powerup((self.rect.x, self.rect.y - 16))
@@ -132,11 +135,11 @@ class QuestionBlock(Sprite):
             self.image = self.images[self.animation[self.frame][0]]
 
     def bump(self) -> None:
-        if self.just_bumped:
+        if self.bumped:
             return
         self.bump_sound.play()
         self.image = self.images[3]
-        self.just_bumped = True
+        self.bumped = True
         self.frame = 0
         # just to make sure it gets updated immediately I'm subtracting 1
         self.last_time = time() - 1
