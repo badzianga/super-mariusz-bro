@@ -91,6 +91,7 @@ class OneUP(Mushroom):
     def __init__(self, image: Surface, position: tuple) -> None:
         super().__init__(image, position)
 
+        self.speed.x *= -1
 
 class Star(Sprite):
     def __init__(self, image: Surface, position: tuple) -> None:

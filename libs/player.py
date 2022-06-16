@@ -13,13 +13,15 @@ from pygame.surface import Surface
 from pygame.transform import flip
 
 from .constants import KOOPA, LOADING_STATE
+from .powerups import OneUP
 
 
 class Mariusz(Sprite):
     def __init__(self, screen: Surface, position: tuple, size: int,
                  add_coin: FunctionType, add_points: FunctionType,
                  create_fireball: FunctionType, remove_life: FunctionType,
-                 switch_game_state: FunctionType) -> None:
+                 switch_game_state: FunctionType,
+                 add_life: FunctionType) -> None:
         super().__init__()
 
         self.screen = screen
@@ -73,6 +75,7 @@ class Mariusz(Sprite):
         self.create_fireball = create_fireball
         self.remove_life = remove_life
         self.switch_game_state = switch_game_state
+        self.add_life = add_life
 
         self.jump_sound = Sound('sfx/smb_jump-small.wav')
         self.large_jump_sound = Sound('sfx/smb_jump-super.wav')
@@ -105,7 +108,6 @@ class Mariusz(Sprite):
         self.hold_jump_timer = 0
 
         self.jumped = False
-        
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -392,8 +394,12 @@ class Mariusz(Sprite):
         if mushroom_collisions:
             for mushroom in mushroom_collisions:
                 mushroom.kill()
-                self.upgrade()
-                self.add_points(1000)
+                if type(mushroom) != OneUP:        
+                    self.upgrade()
+                    self.add_points(1000)
+                else:
+                    self.add_life()
+                    self.add_points('1UP')
 
     def downgrade_animation(self) -> None:
         # I really don't want to but I have to, so there goes spaghetti

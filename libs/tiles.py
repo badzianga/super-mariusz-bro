@@ -1,6 +1,7 @@
 from time import time
 from types import FunctionType
 
+from pygame.constants import SRCALPHA
 from pygame.image import load as load_image
 from pygame.mixer import Sound
 from pygame.sprite import Sprite
@@ -183,6 +184,31 @@ class QuestionBlock(Sprite):
     def draw(self, screen: Surface, scroll: int):
         """Draw sprite onto screen."""
         screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
+
+
+class HiddenBlock(Brick):
+    def __init__(self, position: tuple, plate_image: Surface,
+                 add_powerup: FunctionType) -> None:
+        super().__init__(Surface((16, 16), SRCALPHA), position, None)
+
+        self.cant_bump = False
+
+        self.add_powerup = add_powerup
+        self.plate_image = plate_image
+        self.powerup_sound = Sound('sfx/smb_powerup_appears.wav')
+
+    def bump(self) -> None:
+        if self.bumped or self.cant_bump:
+            return
+        self.bump_sound.play()
+        self.image = self.plate_image
+        self.frame = 0
+        self.bumped = True
+        # just to make sure it gets updated immediately I'm subtracting 1
+        self.last_time = time() - 1
+        self.add_powerup((self.rect.x, self.rect.y - 16), oneup=True)
+        self.powerup_sound.play()
+        self.cant_bump = True
 
 
 class Decoration(Sprite):

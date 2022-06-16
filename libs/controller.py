@@ -22,7 +22,7 @@ from .hud import Hud
 from .level import Level
 from .player import Mariusz
 from .points import Points
-from .powerups import FireFlower, Mushroom
+from .powerups import FireFlower, Mushroom, OneUP
 
 
 class Controller:
@@ -92,7 +92,8 @@ class Controller:
         )
         self.player = Mariusz(screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
-                              self.remove_life, self.switch_state)
+                              self.remove_life, self.switch_state,
+                              self.add_life)
         self.hud = Hud(screen, int(self.world), self.theme, self.font)
 
         # groups
@@ -152,7 +153,8 @@ class Controller:
         )
         self.player = Mariusz(self.screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
-                              self.remove_life, self.switch_state)
+                              self.remove_life, self.switch_state,
+                              self.add_life)
         self.hud = Hud(self.screen, int(self.world), self.theme, self.font)
 
         # groups
@@ -175,8 +177,11 @@ class Controller:
         self.points = 0
         self.world = 1
 
-    def add_powerup(self, position: tuple) -> None:
+    def add_powerup(self, position: tuple, oneup: bool=False) -> None:
         """Generate proper power-up and add it to power-ups group."""
+        if oneup:
+            self.powerups.add(OneUP(self.images['1up'], position))
+            return
         if self.player.size == 0:
             self.powerups.add(Mushroom(self.images['mushroom'], position))
         else:
@@ -200,7 +205,8 @@ class Controller:
         """
         # I'm also using this method from create_debris
         # breaking bricks wouldn't create points sprite
-        self.points += amount
+        if type(amount) == int:
+            self.points += amount
         if create_sprite:
             # TODO: position above killed enemy, not player
             # I can add position as argument, but it's for later
