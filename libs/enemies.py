@@ -1,4 +1,5 @@
 # TODO: fix Koopa points
+# TODO: enemies should be killed when destroying tiles below them
 
 from time import time
 

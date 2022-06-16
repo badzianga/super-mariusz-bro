@@ -1,5 +1,4 @@
 # TODO: player can't kill enemies when invincible
-# TODO: fix collisions with bumped tiles
 
 from time import time
 from types import FunctionType
@@ -125,8 +124,6 @@ class Mariusz(Sprite):
         # TODO: proper shooting timing
         if time() - self.last_shoot_time < 0.4:
             return
-
-        # TODO: shoot only when just pressed button
 
         self.last_shoot_time = time()
 
@@ -382,7 +379,7 @@ class Mariusz(Sprite):
                     self.add_points(100)
                     # TODO: points multiplier from combo
                     enemy.death_state()
-                    return  # TODO: for testing
+                    return
                 else:
                     if self.size == 0:
                         self.kill()

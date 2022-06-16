@@ -115,7 +115,6 @@ class Controller:
         # when timer is 100, music is changed a few times whis is unwanted
         # that's why this switch is needed
         self.dont_change_music = False
-        # TODO: set dont_change_music to True somewhere
 
         self.paused = False  # if game is paused
 

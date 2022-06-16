@@ -59,7 +59,7 @@ class Hud:
         self.screen.blit(self.surface, (16, 8))
 
     def half_reset(self) -> None:
-        """Reset timer, set current coin frame to 0 and change coin ... TODO"""
+        """Reset timer and coin indicator things."""
         self.timer = 400
 
         self.coin_frame = 0

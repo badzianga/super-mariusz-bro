@@ -54,7 +54,6 @@ class Fireball(Sprite):
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
                 if self.speed.y > 0:  # touching floor
-                    # TODO: kill enemy if tile.bumped
                     self.rect.bottom = tile.rect.top
                     self.pos.y = self.rect.y
                     self.speed.y = -4  # TODO: maybe change this value

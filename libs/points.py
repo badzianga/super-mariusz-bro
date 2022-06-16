@@ -1,6 +1,3 @@
-# TODO: prepare Surfaces with points amount and add them as parameters
-# instead of creating them every time they're needed
-
 from time import time
 
 from pygame.font import Font
