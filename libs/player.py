@@ -109,6 +109,9 @@ class Mariusz(Sprite):
 
         self.jumped = False
 
+        self.pipe_time = 0
+        self.piping = False
+
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
             self.state = new_state
@@ -401,6 +404,37 @@ class Mariusz(Sprite):
                     self.add_life()
                     self.add_points('1UP')
 
+    def check_portal_collision(self, portal: tuple):
+        if self.rect.collidepoint(portal[0] - 1, portal[1]):
+            if portal[2] == 'down':
+                if abs(self.rect.centerx - portal[0]) <= 4 and self.crouching:
+                    self.pipe_sound.play()
+                    self.piping = True
+                    self.speed.x = 0
+                    self.speed.y = 1
+                    self.change_state('idle')
+                    self.pipe_time = time()
+            else:  # portal[2] == 'right'
+                # TODO: tutaj coś świruje
+                if abs(self.rect.topright[1] - portal[1]) == 0:
+                    self.pipe_sound.play()
+                    self.piping = True
+                    self.speed.x = 1
+                    self.speed.y = 0
+                    self.change_state('run')
+                    self.pipe_time = time()
+
+    def pipe_animation(self, dt: float) -> bool | None:
+        if time() - self.pipe_time >= 1:
+            return True
+        if self.speed.y > 0:  # down
+            self.pos.y += self.speed.y * dt
+            self.rect.y = self.pos.y
+        else:  # right
+            self.pos.x += self.speed.x * dt
+            self.rect.x = self.pos.x
+            self.update_animation(dt)
+
     def downgrade_animation(self) -> None:
         # I really don't want to but I have to, so there goes spaghetti
         if time() - self.upgrade_timer >= 0.1:
@@ -464,7 +498,7 @@ class Mariusz(Sprite):
         self.remove_life()
         self.die_timer = time()
 
-    def draw(self, scroll: int) -> None:
+    def draw(self, scroll: int) -> bool | None:
         if self.flip:
             self.screen.blit(flip(self.image, True, False),
                              (self.rect.x - scroll, self.rect.y))
@@ -472,8 +506,12 @@ class Mariusz(Sprite):
             self.screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
     def update(self, dt: float, coins: Group, tiles: Group,
-               enemies: Group, mushrooms: Group, scroll: int) -> None:
+               enemies: Group, mushrooms: Group, scroll: int,
+               portal_point: tuple) -> None:
         self.remove_invincibility()
+
+        if self.piping:  # it's here because all other objects (enemies, etc.)
+            return self.pipe_animation(dt)   # should be still updated
 
         if self.can_shoot:
             self.shoot()
@@ -493,5 +531,7 @@ class Mariusz(Sprite):
         # if it will be even after changes in jumping mechanics
         # move this function before move_horizontally() 
         self.check_mushroom_collisions(mushrooms)
+
+        self.check_portal_collision(portal_point)
 
         self.update_animation(dt)

@@ -1,3 +1,6 @@
+# TODO: dt=6 after switch from LOADING state to LEVEL state (1 frame)
+# loading level takes too long so with this dt gravity is applied too much
+
 from sys import exit
 from time import time
 

@@ -142,9 +142,19 @@ class Controller:
             with open('highscore', 'wb') as f:
                 dump(self.highscore, f)
 
-    def reset_level(self) -> None:
-        # TEMPORARY!!!
+        # more spaghetti
+        # these are 'portals' between maps - special colliders on pipes
+        self.portals = {
+            1: (928, 128, 'down'),
+            1.5: (208, 184, 'right')
+        }
 
+    def reset_level(self, change_level: bool=False) -> None:
+        # TEMPORARY!!!
+        self.theme = self.themes[self.world]
+
+        music.load(self.music[self.world])
+        music.play(-1)
         # the most important objects
         self.level = Level(self.screen, self.worlds[self.world], self.theme)
         player_pos = self.level.load_level(
@@ -155,7 +165,8 @@ class Controller:
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state,
                               self.add_life)
-        self.hud = Hud(self.screen, int(self.world), self.theme, self.font)
+        if not change_level:
+            self.hud = Hud(self.screen, int(self.world), self.theme, self.font)
 
         # groups
         self.enemies = self.level.enemies
@@ -300,8 +311,14 @@ class Controller:
             self.fireballs.update(dt, self.tiles_group, self.enemies)
             self.enemies.update(dt, self.tiles_group, self.enemies,
                                 self.scroll)
-            self.player.update(dt, self.coins_group, self.tiles_group,
-                               self.enemies, self.powerups, self.scroll)
+            if self.player.update(dt, self.coins_group, self.tiles_group,
+                                  self.enemies, self.powerups, self.scroll,
+                                  self.portals[self.world]):
+                if isinstance(self.world, int):
+                    self.world += 0.5
+                else:
+                    self.world = int(self.world - 0.5)
+                self.reset_level(change_level=True)
 
             # update HUD content - points, coins and time
             self.hud.update(self.coins, self.points)
@@ -376,8 +393,6 @@ class Controller:
             self.switch_time = time()
         elif self.current_state == LEVEL_STATE:
             self.reset_level()  # TEMPORARY
-            music.load(self.music[self.world])
-            music.play(-1)
         elif self.current_state == GAME_OVER_STATE:
             music.load('music/smb_gameover.wav')
             music.play()
@@ -392,7 +407,6 @@ class Controller:
 
     def run(self, dt: float) -> None:
         """Run current state."""
-
         self.states[self.current_state](dt)
 
         # temporary, I'm using it only during development
