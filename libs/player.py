@@ -23,7 +23,6 @@ class Mariusz(Sprite):
                  switch_game_state: FunctionType,
                  add_life: FunctionType) -> None:
         super().__init__()
-
         self.screen = screen
 
         self.size = size
@@ -90,7 +89,6 @@ class Mariusz(Sprite):
         self.die_timer = 0
         self.is_alive = True
 
-        self.size = 0  # 0 - small, 1 - large, 2 - fire
         self.upgrade_timer = 0
         self.upgrade_sequence = (0, 1, 0, 1, 0, 1, 2, 0, 1, 2)
         self.upgrade_index = 0
@@ -406,7 +404,10 @@ class Mariusz(Sprite):
                     self.add_points('1UP')
 
     def check_portal_collision(self, portal: tuple):
-        if self.rect.collidepoint(portal[0] - 1, portal[1]):
+        print(f'player y: {self.rect.bottomright[1]}, portal y: {portal[1]}')
+        print(f'player x: {self.rect.bottomright[0]}, portal x: {portal[0]}')
+        if self.rect.collidepoint(portal[0], portal[1]):
+            print('collided')
             if portal[2] == 'down':
                 if abs(self.rect.centerx - portal[0]) <= 4 and self.crouching:
                     self.pipe_sound.play()
@@ -417,7 +418,7 @@ class Mariusz(Sprite):
                     self.pipe_time = time()
                     self.before_pipe_pos = self.rect.y
             else:  # portal[2] == 'right'
-                if abs(self.rect.topright[1] - portal[1]) == 0:
+                if abs(self.rect.bottomright[1] - portal[1]) <= 1:
                     self.pipe_sound.play()
                     self.piping = True
                     self.speed.x = 1
@@ -505,10 +506,10 @@ class Mariusz(Sprite):
         if self.piping:
             if self.speed.y > 0:  # piping down
                 diff = self.rect.y - self.before_pipe_pos
-                image = self.image.subsurface(0, 0, 16, 16 - diff)
+                image = self.image.subsurface(0, 0, 16, self.image.get_height() - diff)
             else:  # piping right
                 diff = self.rect.x - self.before_pipe_pos
-                image = self.image.subsurface(0, 0, 16 - diff, 16)
+                image = self.image.subsurface(0, 0, 16 - diff, self.image.get_height())
             self.screen.blit(image, (self.rect.x - scroll, self.rect.y))
             return
 

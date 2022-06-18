@@ -42,6 +42,7 @@ class Controller:
         self.coins = 0
         self.points = 0
         self.world = 1
+        self.player_size = 0
 
         # level variable
         self.scroll = 0
@@ -68,6 +69,7 @@ class Controller:
             1: 'music/smb_supermariobroshurry.mp3',
             1.5: 'music/smb_undergroundhurry.mp3',
         }
+        self.checkpoint = (1320, 184)  # TODO: this is used only for 1-1 for now
 
         # most of the images will be loaded here in the future
         self.images = {
@@ -146,10 +148,11 @@ class Controller:
         # these are 'portals' between maps - special colliders on pipes
         self.portals = {
             1: (928, 128, 'down'),
-            1.5: (208, 184, 'right')
+            1.5: (206, 199, 'right')
         }
 
     def reset_level(self, change_level: bool=False) -> None:
+        self.player_size = self.player.size
         # TEMPORARY!!!
         self.theme = self.themes[self.world]
 
@@ -161,7 +164,7 @@ class Controller:
             self.create_spinning_coin, self.add_coin, self.create_debris,
             self.add_powerup
         )
-        self.player = Mariusz(self.screen, player_pos, 0, self.add_coin,
+        self.player = Mariusz(self.screen, player_pos, self.player_size, self.add_coin,
                               self.add_points, self.create_fireball,
                               self.remove_life, self.switch_state,
                               self.add_life)
