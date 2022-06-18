@@ -111,6 +111,7 @@ class Mariusz(Sprite):
 
         self.pipe_time = 0
         self.piping = False
+        self.before_pipe_pos = 0
 
     def change_state(self, new_state: str) -> None:
         if new_state != self.state:
@@ -414,8 +415,8 @@ class Mariusz(Sprite):
                     self.speed.y = 1
                     self.change_state('idle')
                     self.pipe_time = time()
+                    self.before_pipe_pos = self.rect.y
             else:  # portal[2] == 'right'
-                # TODO: tutaj coś świruje
                 if abs(self.rect.topright[1] - portal[1]) == 0:
                     self.pipe_sound.play()
                     self.piping = True
@@ -423,6 +424,8 @@ class Mariusz(Sprite):
                     self.speed.y = 0
                     self.change_state('run')
                     self.pipe_time = time()
+                    self.before_pipe_pos = self.rect.x
+                    self.flip = False
 
     def pipe_animation(self, dt: float) -> bool | None:
         if time() - self.pipe_time >= 1:
@@ -499,6 +502,16 @@ class Mariusz(Sprite):
         self.die_timer = time()
 
     def draw(self, scroll: int) -> bool | None:
+        if self.piping:
+            if self.speed.y > 0:  # piping down
+                diff = self.rect.y - self.before_pipe_pos
+                image = self.image.subsurface(0, 0, 16, 16 - diff)
+            else:  # piping right
+                diff = self.rect.x - self.before_pipe_pos
+                image = self.image.subsurface(0, 0, 16 - diff, 16)
+            self.screen.blit(image, (self.rect.x - scroll, self.rect.y))
+            return
+
         if self.flip:
             self.screen.blit(flip(self.image, True, False),
                              (self.rect.x - scroll, self.rect.y))
