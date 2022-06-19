@@ -404,10 +404,7 @@ class Mariusz(Sprite):
                     self.add_points('1UP')
 
     def check_portal_collision(self, portal: tuple):
-        print(f'player y: {self.rect.bottomright[1]}, portal y: {portal[1]}')
-        print(f'player x: {self.rect.bottomright[0]}, portal x: {portal[0]}')
         if self.rect.collidepoint(portal[0], portal[1]):
-            print('collided')
             if portal[2] == 'down':
                 if abs(self.rect.centerx - portal[0]) <= 4 and self.crouching:
                     self.pipe_sound.play()
