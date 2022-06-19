@@ -1,3 +1,5 @@
+# TODO: don't reset level when playing for the first time (unnecessary)
+
 from pickle import dump, load
 from time import time
 
@@ -6,8 +8,10 @@ from pygame.font import Font
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.mixer import Sound, music
-from pygame.sprite import Group
+from pygame.sprite import Group, Sprite
 from pygame.time import Clock
+
+from libs.enemies import DeadEnemy
 
 from .coin import SpinningCoin
 from .constants import (BG_COLOR, BLACK, GAME_OVER_STATE, LEVEL_STATE,
@@ -87,7 +91,7 @@ class Controller:
         self.level = Level(screen, self.worlds[self.world], self.theme)
         player_pos = self.level.load_level(
             self.create_spinning_coin, self.add_coin, self.create_debris,
-            self.add_powerup
+            self.add_powerup, self.enemy_kill_animation
         )
         self.player = Mariusz(screen, player_pos, 0, self.add_coin,
                               self.add_points, self.create_fireball,
@@ -151,6 +155,12 @@ class Controller:
         self.previous_level = None
         self.checkpoint = False
 
+    def enemy_kill_animation(self, sprite: Sprite, add_points: bool=True) -> None:
+        self.floating_points.add(DeadEnemy(sprite.image, sprite.rect))
+        if add_points:
+            self.floating_points.add(Points((sprite.rect.x, sprite.rect.y), 100))
+        sprite.kill()
+
     def reset_level(self, change_level: bool=False) -> None:
         self.player_size = self.player.size
         # TEMPORARY!!!
@@ -162,7 +172,7 @@ class Controller:
         self.level = Level(self.screen, self.worlds[self.world], self.theme)
         player_pos = self.level.load_level(
             self.create_spinning_coin, self.add_coin, self.create_debris,
-            self.add_powerup
+            self.add_powerup, self.enemy_kill_animation
         )
         self.player = Mariusz(self.screen, player_pos, self.player_size, self.add_coin,
                               self.add_points, self.create_fireball,

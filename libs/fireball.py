@@ -78,8 +78,7 @@ class Fireball(Sprite):
             else:  # points form Goomba
                 self.add_points(100)
 
-            # TODO: proper enemy killing
-            enemy_collisions[0].kill()
+            enemy_collisions[0].kill_animation(enemy, False)
 
             return  # fireball kills only one enemy
 

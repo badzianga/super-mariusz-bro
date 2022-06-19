@@ -2,10 +2,12 @@
 # TODO: enemies should be killed when destroying tiles below them
 
 from time import time
+from types import FunctionType
 
 from pygame.image import load as load_image
 from pygame.math import Vector2
 from pygame.mixer import Sound
+from pygame.rect import Rect
 from pygame.sprite import Group, Sprite
 from pygame.surface import Surface
 from pygame.transform import flip as flip_image
@@ -18,7 +20,8 @@ class Goomba(Sprite):
     First and most basic enemy. It can walk and collide with map and enemies.
     """
 
-    def __init__(self, x: int, y: int, theme: str) -> None:
+    def __init__(self, x: int, y: int, theme: str,
+                 kill_animation: FunctionType) -> None:
         """Initialize enemy - Goomba."""
         super().__init__()
 
@@ -49,6 +52,8 @@ class Goomba(Sprite):
         self.pos = Vector2(x, y)
         self.speed = Vector2(-1, 0)
 
+        self.kill_animation = kill_animation
+
     def move_horizontally(self, dt: float) -> None:
         "Change horizontal position of the enemy."
         self.pos.x += self.speed.x * dt
@@ -66,7 +71,7 @@ class Goomba(Sprite):
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
                 if tile.bumped:
-                    self.kill()
+                    self.kill_animation(self)
                     return
                 if self.speed.x < 0:  # touching right wall
                     self.rect.left = tile.rect.right
@@ -85,7 +90,7 @@ class Goomba(Sprite):
         for tile in tiles:
             if self.rect.colliderect(tile.rect):
                 if tile.bumped:
-                    self.kill()
+                    self.kill_animation(self)
                     return
                 if self.speed.y > 0:  # touching floor
                     self.rect.bottom = tile.rect.top
@@ -101,13 +106,15 @@ class Goomba(Sprite):
 
             if self.rect.colliderect(enemy.rect):
                 if enemy.type == KOOPA and enemy.spinning:
-                    # TODO: death animation, add points
-                    enemy.kick_sound.play()
+                    # TODO: add points
+                    self.kick_sound.play()
+                    self.kill_animation(self)
                     self.kill()
                     return
                 elif self.type == KOOPA and self.spinning:
-                    # TODO: death animation, add points
+                    # TODO: add points
                     self.kick_sound.play()
+                    enemy.kill_animation(enemy)
                     enemy.kill()
                     return
                         
@@ -126,7 +133,7 @@ class Goomba(Sprite):
         self.image = self.images['die']
         self.is_alive = False
 
-    def draw(self, screen: Surface, scroll: int):
+    def draw(self, screen: Surface, scroll: int) -> None:
         """Draw sprite onto screen."""
         screen.blit(self.image, (self.rect.x - scroll, self.rect.y))
 
@@ -167,9 +174,9 @@ class Koopa(Goomba):
     enemies when jumped on again.
     """
 
-    def __init__(self, x: int, y: int) -> None:
+    def __init__(self, x: int, y: int, kill_animation) -> None:
         """Initialize enemy - Koopa."""
-        super().__init__(x, y, 'red')
+        super().__init__(x, y, 'red', kill_animation)
 
         # only differences from Goomba
         self.type = KOOPA
@@ -204,7 +211,7 @@ class Koopa(Goomba):
         self.speed.x = self.speed.x // 6
         self.last_time = time()
 
-    def draw(self, screen: Surface, scroll: int):
+    def draw(self, screen: Surface, scroll: int) -> None:
         """Draw sprite onto screen."""
         if self.state == 'walk':
             screen.blit(flip_image(self.image, self.flip, False),
@@ -250,3 +257,27 @@ class Koopa(Goomba):
             self.check_enemy_collisions(enemies)
 
             self.flip = self.speed.x > 0
+
+
+class DeadEnemy(Sprite):
+    def __init__(self, image: Surface, rect: Rect) -> None:
+        super().__init__()
+
+        self.image = flip_image(image, False, True)
+
+        self.rect = rect
+        self.pos = Vector2(self.rect.x, self.rect.y)
+        self.speed = -4
+
+    def update(self, dt: float) -> None:
+        if self.rect.y >= 224:
+            self.kill()
+            return
+
+        self.pos.y += self.speed * dt
+        self.rect.y = self.pos.y
+        self.speed = min(self.speed + 1 * dt, 8)
+
+    def draw(self, screen: Surface, scroll: int) -> None:
+        """Draw sprite onto screen."""
+        screen.blit(self.image, (self.rect.x - scroll, self.rect.y))

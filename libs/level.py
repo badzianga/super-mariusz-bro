@@ -46,7 +46,8 @@ class Level:
 
     def load_level(self, create_spinning_coin: FunctionType,
                    add_coin: FunctionType, create_debris: FunctionType,
-                   add_powerup: FunctionType) -> tuple:
+                   add_powerup: FunctionType,
+                   enemy_kill_animation: FunctionType) -> tuple:
         """Load level from file. Returns player position."""
     
         world_data = loadtxt(f"maps/world_{self.world}.csv",
@@ -127,15 +128,15 @@ class Level:
                         player_pos = (x * 16 - 8, y * 16 + 8)
                     case 21:  # goomba
                         self.enemies.add(
-                            Goomba(x * 16, y * 16 + 8, 'red')
+                            Goomba(x * 16, y * 16 + 8, 'red', enemy_kill_animation)
                         )
                     case 22:  # goomba (little bit to the left)
                         self.enemies.add(
-                            Goomba(x * 16 - 8, y * 16 + 8, 'red')
+                            Goomba(x * 16 - 8, y * 16 + 8, 'red', enemy_kill_animation)
                         )
                     case 23:  # koopa
                         self.enemies.add(
-                            Koopa(x * 16, y * 16 + 8)
+                            Koopa(x * 16, y * 16 + 8, enemy_kill_animation)
                         )
                     case 30:  # hill (small)
                         self.decorations.add(
