@@ -1,6 +1,3 @@
-# TODO: self.size variable which holds player.size between levels
-# TODO: save and load high score. Display it in the menu
-
 from pickle import dump, load
 from time import time
 
@@ -150,6 +147,9 @@ class Controller:
             1: (928, 128, 'down'),
             1.5: (206, 199, 'right')
         }
+        # TODO: change this in the future, for now it will work
+        self.previous_level = None
+        self.checkpoint = False
 
     def reset_level(self, change_level: bool=False) -> None:
         self.player_size = self.player.size
@@ -170,6 +170,20 @@ class Controller:
                               self.add_life)
         if not change_level:
             self.hud = Hud(self.screen, int(self.world), self.theme, self.font)
+            # TODO: proper checkpoint (why I'm even doing this)
+            if self.world == 1 and self.checkpoint:
+                self.player.rect.x = 1320
+                self.player.pos.x = 1320
+                self.player.rect.y = 184
+                self.player.pos.y = 184
+        else:
+            # TODO: change this in the future, for now it will work
+            if self.world == 1 and self.previous_level == 1.5:
+                # pipe exit
+                self.player.rect.x = 2616
+                self.player.pos.x = 2616
+                self.player.rect.y = 152
+                self.player.pos.y = 152
 
         # groups
         self.enemies = self.level.enemies
@@ -190,6 +204,9 @@ class Controller:
         self.coins = 0
         self.points = 0
         self.world = 1
+        # TODO: here for now
+        self.previous_level = None
+        self.checkpoint = False
 
     def add_powerup(self, position: tuple, oneup: bool=False) -> None:
         """Generate proper power-up and add it to power-ups group."""
@@ -317,11 +334,16 @@ class Controller:
             if self.player.update(dt, self.coins_group, self.tiles_group,
                                   self.enemies, self.powerups, self.scroll,
                                   self.portals[self.world]):
+                self.previous_level = self.world
                 if isinstance(self.world, int):
                     self.world += 0.5
                 else:
                     self.world = int(self.world - 0.5)
                 self.reset_level(change_level=True)
+
+            # TODO: proper checkpoint, for now this will work
+            if self.player.rect.x >= 1320:
+                self.checkpoint = True
 
             # update HUD content - points, coins and time
             self.hud.update(self.coins, self.points)
