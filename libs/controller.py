@@ -206,7 +206,7 @@ class Controller:
         self.dont_change_music = False
         self.paused = False  # if game is paused
         self.switch_time = time()  # TODO: change this later
-        self.scroll = 0  # TODO: apply checkpoint scroll if needed
+        self.scroll = 0
 
     def reset_game(self) -> None:
         self.reset_level()
@@ -338,7 +338,7 @@ class Controller:
         if self.player.is_alive and not self.player.is_upgrading:
             # update positions
             self.powerups.update(dt, self.tiles_group)
-            self.fireballs.update(dt, self.tiles_group, self.enemies)
+            self.fireballs.update(dt, self.tiles_group, self.enemies, self.scroll)
             self.enemies.update(dt, self.tiles_group, self.enemies,
                                 self.scroll)
             if self.player.update(dt, self.coins_group, self.tiles_group,

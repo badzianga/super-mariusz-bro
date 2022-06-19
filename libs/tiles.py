@@ -155,7 +155,7 @@ class QuestionBlock(Sprite):
                 else:
                     self.updated = True
                     if self.powerup:
-                        # TODO: juhuuu
+                        # TODO: powerup appear animation
                         self.add_powerup((self.rect.x, self.rect.y - 16))
                 self.frame += 1
                 self.last_time = time()

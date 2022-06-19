@@ -1,4 +1,3 @@
-# TODO: fix Koopa points
 # TODO: enemies should be killed when destroying tiles below them
 
 from time import time
@@ -106,13 +105,11 @@ class Goomba(Sprite):
 
             if self.rect.colliderect(enemy.rect):
                 if enemy.type == KOOPA and enemy.spinning:
-                    # TODO: add points
                     self.kick_sound.play()
                     self.kill_animation(self)
                     self.kill()
                     return
                 elif self.type == KOOPA and self.spinning:
-                    # TODO: add points
                     self.kick_sound.play()
                     enemy.kill_animation(enemy)
                     enemy.kill()

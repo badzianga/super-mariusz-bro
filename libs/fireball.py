@@ -1,5 +1,3 @@
-# TODO: kill fireballs when too far from player
-
 from time import time
 from types import FunctionType
 
@@ -56,7 +54,7 @@ class Fireball(Sprite):
                 if self.speed.y > 0:  # touching floor
                     self.rect.bottom = tile.rect.top
                     self.pos.y = self.rect.y
-                    self.speed.y = -4  # TODO: maybe change this value
+                    self.speed.y = -4
                 else:  # touching ceiling
                     # TODO: explosion animation
                     self.kill()
@@ -90,7 +88,10 @@ class Fireball(Sprite):
                 self.frame = 0
             self.image = self.images[self.frame]
 
-    def update(self, dt: float, tiles: Group, enemies: Group) -> None:
+    def update(self, dt: float, tiles: Group, enemies: Group, scroll: int) -> None:
+        if self.rect.x - scroll < -48 or self.rect.y > 224 or self.rect.x - scroll > 304:
+            self.kill()
+
         self.update_animation()
 
         # change vertical position

@@ -125,7 +125,6 @@ class Mariusz(Sprite):
         if self.size < 2:
             return
 
-        # TODO: proper shooting timing
         if time() - self.last_shoot_time < 0.4:
             return
 
@@ -187,7 +186,6 @@ class Mariusz(Sprite):
         
         if self.state == 'run':
             self.frame_index += 0.25 * abs(self.speed.x) * dt
-            # TODO: maybe here fix with running into walls?
             if self.frame_index >= 3:
                 self.frame_index = 0
             self.image = self.states[self.size][self.state][int(self.frame_index)]
@@ -481,7 +479,7 @@ class Mariusz(Sprite):
         if time() - self.die_timer >= 0.4 and self.rect.y <= 224: 
             self.move_vertically(dt)
 
-        if time() - self.die_timer >= 3.4:  # TODO: maybe change this time
+        if time() - self.die_timer >= 3.4:
             self.switch_game_state(LOADING_STATE)
 
     def kill(self) -> None:
@@ -489,8 +487,8 @@ class Mariusz(Sprite):
         music.play()
         self.change_state('die')
         if self.size > 0:
-            self.rect.y += 16  # TODO: this might be bad in the future
-            self.pos.y += 16  # TODO: this too
+            self.rect.y += 16
+            self.pos.y += 16
         self.size = 0
         self.image = self.states[self.size]['die']
         self.is_alive = False
@@ -538,9 +536,6 @@ class Mariusz(Sprite):
 
         self.check_enemy_collisions(enemies)
 
-        # TODO: there is a bug when jumping immediately after upgrade sequence
-        # if it will be even after changes in jumping mechanics
-        # move this function before move_horizontally() 
         self.check_mushroom_collisions(mushrooms)
 
         self.check_portal_collision(portal_point)
