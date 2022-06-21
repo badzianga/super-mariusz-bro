@@ -40,6 +40,8 @@ class Level:
         self.pipe_img_1 = load_image('img/pipe_1.png').convert_alpha()
         self.pipe_img_2 = load_image('img/pipe_2.png').convert_alpha()
         self.pipe_img_3 = load_image('img/pipe_3.png').convert_alpha()
+        self.pole_image = load_image('img/pole_0.png').convert_alpha()
+        self.castle_image = load_image('img/castle_0.png').convert_alpha()
 
         # TODO: temporary?
         self.world = world
@@ -169,6 +171,14 @@ class Level:
                     case 37:  # cloud (large)
                         self.decorations.add(
                             Decoration((x * 16 + 8, y * 16 + 8), self.cloud_img_2)
+                        )
+                    case 38:  # pole
+                        self.decorations.add(
+                            Decoration((x * 16 + 8, y * 16), self.pole_image)
+                        )
+                    case 39:  # castle
+                        self.decorations.add(
+                            Decoration((x * 16, y * 16 + 8), self.castle_image)
                         )
         return player_pos
 
