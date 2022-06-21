@@ -1,5 +1,3 @@
-# TODO: player can't kill enemies when invincible
-
 from time import time
 from types import FunctionType
 
@@ -409,10 +407,6 @@ class Mariusz(Sprite):
             self.add_coin()
 
     def check_enemy_collisions(self, enemies: Group) -> None:
-        # TODO: player should can kill enemies when invincible
-        if self.invincible:
-            return
-
         enemy_collisions = spritecollide(self, enemies, False)
 
         if enemy_collisions:
@@ -461,6 +455,8 @@ class Mariusz(Sprite):
                     enemy.death_state()
                     return
                 else:
+                    if self.invincible:
+                        return
                     if self.size == 0:
                         self.kill()
                     else:
