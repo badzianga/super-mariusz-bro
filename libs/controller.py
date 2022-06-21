@@ -112,6 +112,7 @@ class Controller:
         self.coin_sound = Sound('sfx/smb_coin.wav')
         self.oneup_sound = Sound('sfx/smb_1-up.wav')
         self.fireball_sound = Sound('sfx/smb_fireball.wav')
+        self.kick_sound = Sound('sfx/smb_kick.wav')
 
         # debug object, used to display useful info during development
         self.debug = Debug(screen, clock)
@@ -157,6 +158,7 @@ class Controller:
 
     def enemy_kill_animation(self, sprite: Sprite, add_points: bool=True) -> None:
         self.floating_points.add(DeadEnemy(sprite.image, sprite.rect))
+        self.kick_sound.play()
         if add_points:
             self.floating_points.add(Points((sprite.rect.x, sprite.rect.y), 100))
         sprite.kill()
