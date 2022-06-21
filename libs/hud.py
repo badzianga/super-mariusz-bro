@@ -125,9 +125,20 @@ class Hud:
         surf = self.font.render('GAME OVER', False, WHITE)
         self.screen.blit(surf, (88, 120))
 
-    def update_timer(self) -> None:
+    def subtract_time(self) -> int:
+        if self.timer > 1:
+            self.timer -= 2
+            return 100
+        elif self.timer == 1:
+            self.timer -= 1
+            return 50
+        else:
+            return 0
+
+    def update_timer(self, update_time: bool=True) -> None:
         """Update timer and draw it onto HUD surface."""
-        if time() - self.last_time >= 0.4:
+        if update_time:
+            if time() - self.last_time >= 0.4:
                 self.timer = max(self.timer - 1, 0)
                 self.last_time = time()
 

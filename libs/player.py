@@ -7,7 +7,7 @@ from pygame.constants import K_DOWN, K_LEFT, K_RIGHT, K_a
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.math import Vector2
-from pygame.mixer import Sound, music
+from pygame.mixer import Sound, music, Channel
 from pygame.sprite import Group, Sprite, spritecollide
 from pygame.surface import Surface
 from pygame.transform import flip
@@ -37,6 +37,7 @@ class Mariusz(Sprite):
                 'jump': load_image('img/jump_0.png').convert_alpha(),
                 'die': load_image('img/die_0.png').convert_alpha(),
                 'brake': load_image('img/brake_0.png').convert_alpha(),
+                'slide': load_image('img/slide_0.png').convert_alpha(),
                 'upgrade': [load_image(f'img/upgrade_{i}.png').convert_alpha()
                             for i in range(3)],
                 'upgrade_2': [
@@ -51,7 +52,8 @@ class Mariusz(Sprite):
                         for i in range(3)],
                 'jump': load_image('img/large_jump_0.png').convert_alpha(),
                 'crouch': load_image('img/large_crouch_0.png').convert_alpha(),
-                'brake': load_image('img/large_brake_0.png').convert_alpha()
+                'brake': load_image('img/large_brake_0.png').convert_alpha(),
+                'slide': load_image('img/large_slide_0.png').convert_alpha()
             },
             2: {
                 'idle': load_image('img/fire_idle_0.png').convert_alpha(),
@@ -59,7 +61,8 @@ class Mariusz(Sprite):
                         for i in range(3)],
                 'jump': load_image('img/fire_jump_0.png').convert_alpha(),
                 'crouch': load_image('img/fire_crouch_0.png').convert_alpha(),
-                'brake': load_image('img/fire_brake_0.png').convert_alpha()
+                'brake': load_image('img/fire_brake_0.png').convert_alpha(),
+                'slide': load_image('img/fire_slide_0.png').convert_alpha()
             }
         }
         self.image = self.states[self.size]['idle']
@@ -82,6 +85,7 @@ class Mariusz(Sprite):
         self.powerup_sound = Sound('sfx/smb_powerup.wav')
         self.pipe_sound = Sound('sfx/smb_pipe.wav')
         self.kick_sound = Sound('sfx/smb_kick.wav')
+        self.slide_sound = Sound('sfx/smb_flagpole.wav')
 
         self.in_air = False
         self.crouching = False
@@ -111,7 +115,16 @@ class Mariusz(Sprite):
         self.piping = False
         self.before_pipe_pos = 0
 
+        self.sliding = False
+        self.sitting = False
+        self.walking_to_castle = False
+        self.dont_draw = False
+        self.channel = Channel(7)
+        self.sit_time = 0
+
     def change_state(self, new_state: str) -> None:
+        if self.state == 'slide':
+            return
         if new_state != self.state:
             self.state = new_state
             self.frame_index = 0
@@ -254,6 +267,71 @@ class Mariusz(Sprite):
             self.speed.x = 0
             self.pos.x = scroll
             self.rect.x = scroll
+
+        # pole collision
+        if self.pos.x >= 3161:
+            if self.rect.y <= 96:
+                self.add_points(5000, True)
+            elif self.rect.y <= 128:
+                self.add_points(2000, True)
+            elif self.rect.y <= 144:
+                self.add_points(1000, True)
+            elif self.rect.y <= 160:
+                self.add_points(500, True)
+            else:
+                self.add_points(200, True)
+            self.start_slide()
+
+    def start_slide(self) -> None:
+        music.stop()
+        self.channel.play(self.slide_sound)
+        self.flip = False
+        self.rect.x = 3161
+        self.pos.x = 3161
+        self.speed.x = 0
+        self.speed.y = 0
+        self.change_state('slide')
+        self.sliding = True
+
+    def slide_animation(self, dt: float, tiles: Group) -> None:
+        """Actually, it's a whole slide-to-castle sequence."""
+        if self.dont_draw:
+            pass
+        elif self.walking_to_castle:
+            # apply gravity
+            self.speed.y = min(self.speed.y + 1 * dt, 8)
+            self.pos.y += self.speed.y * dt
+            self.rect.y = self.pos.y
+            self.check_vertical_collisions(tiles)
+            self.change_state('run')
+            # walk towards castle
+            self.pos.x += 2 * dt
+            self.rect.x = self.pos.x
+            self.update_animation(dt)
+            if self.rect.x >= 3264:
+                self.dont_draw = True
+        elif self.sitting:
+            if time() - self.sit_time >= 0.5:
+                self.walking_to_castle = True
+                self.flip = False
+                self.state = 'run'
+                self.speed.x = 2
+                self.frame_index = 0
+                music.load('music/smb_stage_clear.wav')
+                music.play()
+                
+        else:  # sliding
+            self.pos.y += 2 * dt
+            self.rect.y = self.pos.y
+
+            if self.rect.bottom >= 184:
+                self.rect.bottom = 184
+                if not self.channel.get_busy():
+                    self.sitting = True
+                    self.flip = True
+                    self.rect.x += 14
+                    self.pos.x += 14
+                    self.sit_time = time()
 
     def move_vertically(self, dt: float) -> None:
         # apply gravity
@@ -498,6 +576,9 @@ class Mariusz(Sprite):
         self.die_timer = time()
 
     def draw(self, scroll: int) -> bool | None:
+        if self.dont_draw:
+            return
+
         if self.piping:
             if self.speed.y > 0:  # piping down
                 diff = self.rect.y - self.before_pipe_pos
@@ -521,6 +602,10 @@ class Mariusz(Sprite):
 
         if self.piping:  # it's here because all other objects (enemies, etc.)
             return self.pipe_animation(dt)   # should be still updated
+
+        if self.sliding:
+            self.slide_animation(dt, tiles)
+            return
 
         if self.can_shoot:
             self.shoot()

@@ -168,8 +168,9 @@ class Controller:
         # TEMPORARY!!!
         self.theme = self.themes[self.world]
 
-        music.load(self.music[self.world])
-        music.play(-1)
+        if not self.dont_play_music:
+            music.load(self.music[self.world])
+            music.play(-1)
         # the most important objects
         self.level = Level(self.screen, self.worlds[self.world], self.theme)
         player_pos = self.level.load_level(
@@ -210,6 +211,9 @@ class Controller:
         self.switch_time = time()  # TODO: change this later
         self.scroll = 0
 
+        self.end_time = 0
+        self.dont_play_music = False
+
     def reset_game(self) -> None:
         self.reset_level()
         self.lifes = 3
@@ -219,6 +223,7 @@ class Controller:
         # TODO: here for now
         self.previous_level = None
         self.checkpoint = False
+        self.end_time = 0
 
     def add_powerup(self, position: tuple, oneup: bool=False) -> None:
         """Generate proper power-up and add it to power-ups group."""
@@ -359,15 +364,22 @@ class Controller:
 
             # update HUD content - points, coins and time
             self.hud.update(self.coins, self.points)
-            self.hud.update_timer()
+            self.hud.update_timer(not self.player.sliding)
 
+            if self.player.dont_draw:
+                self.points += self.hud.subtract_time()
+                if self.hud.timer == 0:
+                    if self.end_time == 0 and not music.get_busy():
+                        self.end_time = time()
+                    if self.end_time != 0:
+                        if time() - self.end_time >= 2:
+                            self.switch_state(MENU_STATE)
             # play hurry music
-            if self.hud.timer == 100:
+            elif self.hud.timer == 100:
                 if not self.dont_change_music:
                     music.load(self.music_hurry[self.world])
                     music.play()
                 self.dont_change_music = True
-
             # kill player when time expires
             elif self.hud.timer == 0:
                 self.player.kill()
@@ -424,6 +436,7 @@ class Controller:
             self.current_state = GAME_OVER_STATE
     
         if self.current_state == LOADING_STATE:
+            self.dont_play_music = False
             music.pause()
             self.hud.update_world(int(self.world))
             self.hud.half_reset()
@@ -440,6 +453,12 @@ class Controller:
                     dump(self.points, f)
                     self.highscore = self.points
         elif self.current_state == MENU_STATE:
+            self.dont_play_music = True
+            # save score
+            if self.points > self.highscore:
+                with open('highscore', 'wb') as f:
+                    dump(self.points, f)
+                    self.highscore = self.points
             self.reset_game()
 
     def run(self, dt: float) -> None:
